@@ -1,40 +1,47 @@
-/* Hyperscale Ledger — design language adapted from Linear (awesome-design-md/linear.app)
-   Near-black canvas, four-step surface ladder, single lavender accent, hairline borders.
-   No gradients, no decorative colour, no shadow-based hierarchy. */
+/* Hyperscale Ledger — house design language, carried over from ai-stack-field-atlas:
+   deep navy ground, brass accent, warm paper ink, Fraunces display serif.
+   No gradients on content, no shadow hierarchy — rules and weight do the work. */
+
+@font-face{ font-family:"Fraunces"; src:url("fonts/fraunces-600.woff2") format("woff2");
+            font-weight:600; font-style:normal; font-display:swap; }
+@font-face{ font-family:"Fraunces"; src:url("fonts/fraunces-600-italic.woff2") format("woff2");
+            font-weight:600; font-style:italic; font-display:swap; }
 
 :root {
-  --primary: #5e6ad2;
-  --primary-hover: #828fff;
-  --primary-focus: #5e69d1;
-  --on-primary: #ffffff;
+  --primary: #C9A96A;          /* brass */
+  --primary-hover: #E8CD92;
+  --primary-focus: #97804F;
+  --on-primary: #081321;
 
-  --ink: #f7f8f8;
-  --ink-muted: #d0d6e0;
-  --ink-subtle: #8a8f98;
-  --ink-tertiary: #62666d;
+  --ink: #F2EDE3;              /* warm paper */
+  --ink-muted: #D9D3C6;
+  --ink-subtle: #B4AE9F;
+  --ink-tertiary: #8A8474;
 
-  --canvas: #010102;
-  --surface-1: #0f1011;
-  --surface-2: #141516;
-  --surface-3: #18191a;
-  --surface-4: #191a1b;
+  --canvas: #081321;           /* deep navy ground */
+  --surface-1: #0d1c2b;
+  --surface-2: #13253a;
+  --surface-3: #172c44;
+  --surface-4: #1b3251;
 
-  --hairline: #23252a;
-  --hairline-strong: #34343a;
-  --hairline-tertiary: #3e3e44;
+  --hairline: rgba(201,169,106,.16);
+  --hairline-strong: rgba(201,169,106,.30);
+  --hairline-tertiary: rgba(201,169,106,.44);
 
-  --success: #27a644;
-  --warn: #c9903a;
-  --alert: #cf5c4a;
+  --success: #8FAE6B;
+  --warn: #C7A055;
+  --alert: #b8664c;
 
-  --r-xs: 4px;  --r-sm: 6px;  --r-md: 8px;
+  --r-xs: 3px;  --r-sm: 4px;  --r-md: 5px;
   --r-lg: 6px; --r-xl: 8px; --r-pill: 9999px;
 
   --s-xxs: 4px; --s-xs: 8px;  --s-sm: 12px; --s-md: 16px;
   --s-lg: 24px; --s-xl: 32px; --s-xxl: 48px; --s-section: 96px;
 
-  --sans: "SF Pro Display", -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif;
-  --mono: "SF Mono", ui-monospace, "JetBrains Mono", "Menlo", monospace;
+  --display: "Fraunces", "Iowan Old Style", Palatino, Georgia, serif;
+  --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+  --serif: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Palatino, Georgia, serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 
   --maxw: 1180px;
 }
@@ -47,27 +54,28 @@ body {
   margin: 0;
   background: var(--canvas);
   color: var(--ink);
-  font-family: var(--sans);
-  font-size: 16px;
-  line-height: 1.5;
-  letter-spacing: -0.05px;
+  font-family: var(--serif);
+  font-size: 15.5px;
+  line-height: 1.55;
+  letter-spacing: 0;
   -webkit-font-smoothing: antialiased;
 }
 
 /* ---------- type ---------- */
 h1, h2, h3 { margin: 0; font-weight: 600; }
-h1 { font-size: 19px; line-height: 1.3; letter-spacing: -0.3px; font-weight: 600; }
-h2 { font-size: 13px; line-height: 1.3; letter-spacing: 0.3px; font-weight: 600; text-transform: uppercase; color: var(--ink-subtle); }
+h1 { font-family: var(--display); }
+h1 { font-size: 25px; line-height: 1.24; letter-spacing: -0.1px; font-weight: 600; color: var(--ink); }
+h2 { font-family: var(--sans); font-size: 11.5px; line-height: 1.3; letter-spacing: .09em; font-weight: 600; text-transform: uppercase; color: var(--primary); }
 h3 { font-size: 16px; line-height: 1.3; letter-spacing: -0.2px; font-weight: 500; }
 p  { margin: 0 0 var(--s-sm); color: var(--ink-muted); }
 a  { color: var(--primary-hover); text-decoration: none; }
 a:hover { text-decoration: underline; }
 
 .eyebrow {
-  font-size: 13px; font-weight: 500; letter-spacing: 0.4px;
+  font-family: var(--sans); font-size: 11px; font-weight: 500; letter-spacing: 0.4px;
   text-transform: uppercase; color: var(--ink-subtle);
 }
-.sub { color: var(--ink-subtle); font-size: 14px; }
+.sub { color: var(--ink-subtle); font-size: 13px; font-family: var(--sans); }
 .mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
 .num  { font-family: var(--mono); font-variant-numeric: tabular-nums; letter-spacing: 0; }
 
@@ -84,7 +92,7 @@ header.top {
   display: flex; align-items: center; gap: var(--s-md); flex-wrap: wrap;
 }
 .brand { display: flex; align-items: baseline; gap: var(--s-xs); margin-right: auto; }
-.brand b { font-size: 15px; font-weight: 600; letter-spacing: -0.3px; }
+.brand b { font-family: var(--display); font-size: 16px; font-weight: 600; letter-spacing: 0; }
 .brand span { font-size: 12px; color: var(--ink-tertiary); }
 .dot { width: 7px; height: 7px; border-radius: var(--r-pill); background: var(--primary); display: inline-block; }
 
@@ -125,7 +133,7 @@ section.view[hidden] { display: none; }
   background: transparent; border: none; border-top: 1px solid var(--hairline-strong);
   border-radius: 0; padding: var(--s-xs) 0 var(--s-sm);
 }
-.tile .k { font-size: 12px; color: var(--ink-subtle); letter-spacing: 0.2px; }
+.tile .k { font-family: var(--sans); font-size: 11.5px; color: var(--ink-subtle); letter-spacing: 0.2px; }
 .tile .v {
   font-family: var(--mono); font-variant-numeric: tabular-nums;
   font-size: 19px; font-weight: 400; letter-spacing: -0.3px; margin-top: 3px;
@@ -138,14 +146,14 @@ section.view[hidden] { display: none; }
 /* ---------- controls ---------- */
 .ctl { margin-bottom: var(--s-md); }
 .ctl-head { display: flex; justify-content: space-between; align-items: baseline; gap: var(--s-xs); }
-.ctl-head label { font-size: 13px; color: var(--ink-muted); }
+.ctl-head label { font-family: var(--sans); font-size: 12.5px; color: var(--ink-muted); }
 .ctl-head .val {
   font-family: var(--mono); font-variant-numeric: tabular-nums;
   font-size: 13px; color: var(--ink);
   background: var(--surface-3); border: 1px solid var(--hairline);
   border-radius: var(--r-xs); padding: 1px 7px;
 }
-.ctl .note { font-size: 11px; color: var(--ink-tertiary); margin-top: 4px; }
+.ctl .note { font-family: var(--sans); font-size: 11px; color: var(--ink-tertiary); margin-top: 4px; }
 
 input[type=range] {
   -webkit-appearance: none; appearance: none;
@@ -160,8 +168,8 @@ input[type=range]::-webkit-slider-thumb {
   background: var(--ink); border: none; margin-top: -5.5px;
   transition: background .12s;
 }
-input[type=range]:hover::-webkit-slider-thumb { background: var(--primary-hover); }
-input[type=range]:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 4px rgba(94,106,210,.35); }
+input[type=range]:hover::-webkit-slider-thumb { background: var(--primary); }
+input[type=range]:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 4px rgba(201,169,106,.32); }
 input[type=range]::-moz-range-track { height: 3px; background: var(--hairline-strong); border-radius: var(--r-pill); }
 input[type=range]::-moz-range-thumb { width: 14px; height: 14px; border: none; border-radius: var(--r-pill); background: var(--ink); }
 
@@ -183,14 +191,14 @@ input[type=text], select {
 }
 input[type=text]:focus, select:focus {
   outline: none; border-color: var(--primary-focus);
-  box-shadow: 0 0 0 3px rgba(94,106,210,.25);
+  box-shadow: 0 0 0 3px rgba(201,169,106,.22);
 }
 
 /* ---------- tables ---------- */
 .tbl-scroll { overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; font-size: 13px; }
 th {
-  text-align: left; font-size: 11px; font-weight: 500;
+  font-family: var(--sans); text-align: left; font-size: 10.5px; font-weight: 500;
   text-transform: uppercase; letter-spacing: 0.4px; color: var(--ink-subtle);
   border-bottom: 1px solid var(--hairline-strong); padding: 8px 10px; white-space: nowrap;
 }
@@ -208,9 +216,9 @@ td strong { color: var(--ink); font-weight: 500; }
   border-radius: var(--r-xs); padding: 1px 5px; border: 1px solid var(--hairline-strong);
   color: var(--ink-subtle); background: var(--surface-3); white-space: nowrap;
 }
-.tag.f { color: var(--success); border-color: rgba(39,166,68,.4); }
-.tag.r { color: var(--warn);    border-color: rgba(201,144,58,.4); }
-.tag.t { color: var(--primary-hover); border-color: rgba(94,106,210,.45); }
+.tag.f { color: var(--success); border-color: rgba(143,174,107,.42); }
+.tag.r { color: var(--warn);    border-color: rgba(199,160,85,.42); }
+.tag.t { color: var(--primary-hover); border-color: rgba(201,169,106,.45); }
 .tag.null { color: var(--ink-tertiary); }
 
 /* ---------- callout ---------- */
@@ -222,7 +230,7 @@ td strong { color: var(--ink); font-weight: 500; }
   border-radius: var(--r-md);
   padding: var(--s-md);
 }
-.callout.alert { border-color: rgba(207, 92, 74, .38); }
+.callout.alert { border-color: rgba(184,102,76,.45); }
 .callout p:last-child { margin-bottom: 0; }
 
 /* ---------- chart ---------- */
@@ -253,4 +261,43 @@ footer.foot a { color: var(--ink-subtle); }
   .grid-2, .grid-3, .grid-4, .model-cols { grid-template-columns: 1fr; }
   h1 { font-size: 30px; letter-spacing: -0.7px; }
   .hero { padding: var(--s-xl) 0 var(--s-lg); }
+}
+
+/* ---------- campus: the hero visual, rendered from the model ---------- */
+.campus {
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-xs);
+  padding: var(--s-md);
+  background:
+    radial-gradient(120% 180% at 50% -40%, rgba(201,169,106,.10), transparent 62%),
+    var(--canvas);
+  overflow: hidden;
+}
+.campus-head {
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: var(--s-md); margin-bottom: var(--s-sm); flex-wrap: wrap;
+}
+.campus-head .t {
+  font-size: 11px; text-transform: uppercase; letter-spacing: .5px;
+  color: var(--ink-subtle); font-weight: 500;
+}
+.campus-head .r {
+  font-family: var(--mono); font-size: 11px; color: var(--ink-tertiary);
+  font-variant-numeric: tabular-nums;
+}
+.campus svg { display: block; width: 100%; height: auto; }
+
+/* each glyph is a rack unit; the sweep reads as power moving through the hall */
+.campus .u { fill: var(--hairline-strong); }
+.campus .u.on {
+  fill: var(--primary);
+  animation: pulse 3.4s ease-in-out infinite;
+}
+.campus .u.edge { fill: var(--primary-hover); }
+@keyframes pulse {
+  0%, 72%, 100% { opacity: .34; }
+  36%           { opacity: 1;   }
+}
+@media (prefers-reduced-motion: reduce) {
+  .campus .u.on { animation: none; opacity: .62; }
 }

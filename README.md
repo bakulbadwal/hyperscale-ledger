@@ -13,6 +13,12 @@
 
 <img src="docs/hero.png" alt="Hyperscale Ledger — the 2027 scenario model, with every assumption exposed as a control" width="100%">
 
+<br><br>
+
+<img src="docs/campus.gif" alt="The campus grid redrawing as IT load sweeps from 90 to 590 MW — one glyph is ten GB200 NVL72 racks" width="100%">
+
+<sub><b>Every glyph is ten real racks.</b> The grid is drawn from the model, not decoration — it redraws as IT load sweeps 90 → 590 MW, and the counts above it are live.</sub>
+
 </div>
 
 ---

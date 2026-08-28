@@ -59,7 +59,16 @@ const K = {
 };
 
 let S = {};
-const resetState = () => { S = {}; CONTROLS.forEach(c => S[c.id] = c.def); };
+const resetState = () => {
+  // Any control can be preset from the query string, so a specific scenario is linkable:
+  //   ?it_mw=400&gpu_life=3   → someone else opens exactly the case you are arguing.
+  const q = new URLSearchParams(location.search);
+  S = {};
+  CONTROLS.forEach(c => {
+    const raw = parseFloat(q.get(c.id));
+    S[c.id] = isFinite(raw) ? Math.min(Math.max(raw, c.min), c.max) : c.def;
+  });
+};
 
 function model(s = S) {
   const racks = (s.it_mw * 1000) / s.rack_kw;
@@ -128,6 +137,7 @@ function renderScenario() {
     `<div class="tile${i === 7 ? " accent" : ""}"><div class="k">${k}</div><div class="v">${v}</div><div class="d">${d}</div></div>`
   ).join("");
 
+  renderCampus(m);
   renderTornado();
 
   const spread = Math.abs(m.capexBottomUp - m.capexTopDown) / Math.min(m.capexBottomUp, m.capexTopDown);
@@ -150,6 +160,39 @@ function renderScenario() {
       <tr><td><strong>Same figure vs. FP4 nameplate</strong><div class="sub">the comparison to avoid</div></td><td class="n">${fmt.pct(m.sustEF / (m.peakEF * 2))}</td></tr>
     </table>
     <p class="sub" style="margin-top:12px;margin-bottom:0">Like-for-like, nameplate overstates delivered capacity by <strong style="color:var(--ink)">${fmt.n1(ratio)}×</strong>. Quote the same measurement against the <em>FP4</em> nameplate and it becomes ${fmt.n1(ratio * 2)}× — but half that gap is one precision halving, not lost utilisation.</p>`;
+}
+
+/* ---------- campus ----------
+   The hero visual is drawn from the model, not decoration: one glyph is one
+   rack-unit of real capacity, the grid grows and shrinks with the sliders, and
+   the sweep is power moving down the hall. Nothing here is stock art. */
+function renderCampus(m) {
+  const PER_UNIT = 10, COLS = 52, W = 10, H = 14, GAP = 3;
+  const units = Math.max(1, Math.round(m.racks / PER_UNIT));
+  const rows = Math.ceil(units / COLS);
+  const vbW = COLS * (W + GAP) - GAP;
+  const vbH = rows * (H + GAP) - GAP;
+
+  let g = "";
+  for (let i = 0; i < units; i++) {
+    const c = i % COLS, r = (i / COLS) | 0;
+    const x = c * (W + GAP), y = r * (H + GAP);
+    const last = i >= units - (units % COLS || COLS);
+    const delay = (((c * 0.85 + r * 2.4) % 11) * 0.3).toFixed(2);
+    g += `<rect class="u on${last ? " edge" : ""}" x="${x}" y="${y}" width="${W}" height="${H}" rx="1.5" style="animation-delay:${delay}s"/>`;
+  }
+
+  $("#campus").innerHTML = `
+    <div class="campus">
+      <div class="campus-head">
+        <span class="t">Campus at ${fmt.int(S.it_mw)} MW — one glyph is ${PER_UNIT} racks</span>
+        <span class="r">${fmt.int(m.racks)} racks · ${fmt.int(m.gpus)} GPUs · ${fmt.n1(m.facilityMW)} MW drawn · ${fmt.n2(m.twh)} TWh/yr</span>
+      </div>
+      <svg viewBox="0 0 ${vbW} ${vbH}" preserveAspectRatio="xMidYMin meet"
+           role="img" aria-label="${fmt.int(m.racks)} GB200 NVL72 racks at ${fmt.int(S.it_mw)} megawatts">
+        ${g}
+      </svg>
+    </div>`;
 }
 
 /* ---------- tornado ---------- */
