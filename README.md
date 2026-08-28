@@ -106,7 +106,8 @@ Every view is hash-addressable — `#trend`, `#corrections` — and every model 
 
 <div align="center">
 
-Built for **GBUS 8255 — Business of AI Reading Seminar**, UVA Darden · Session 3, *The Thinking Machine* (Stephen Witt)
-<br>Built with [Claude Code](https://claude.com/claude-code) · MIT licensed
+Built by **[Bakul Badwal](https://www.linkedin.com/in/bakulbadwal/)** — MBA Candidate, UVA Darden, Class of 2027 — with [Claude Code](https://claude.com/claude-code).
+<br>For **GBUS 8255 — Business of AI Reading Seminar** (Laseter) · Session 3, *The Thinking Machine* (Stephen Witt)
+<br>Companion to **[The AI Stack Field Atlas](https://github.com/bakulbadwal/ai-stack-field-atlas)** · MIT licensed
 
 </div>
