@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hyperscale Ledger — audited GPU specs &amp; a 2027 data-center model</title>
+<meta name="description" content="An audited specification corpus for NVIDIA datacenter GPUs, with a 2027 hyperscale data-center scenario model. Sparse and dense separated, every value sourced.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="top">
+  <div class="top-inner">
+    <div class="brand">
+      <span class="dot"></span>
+      <b>Hyperscale Ledger</b>
+      <span>audited GPU specs · 2027 scenario model</span>
+    </div>
+    <nav class="tabs" id="tabs" role="tablist">
+      <button role="tab" data-view="scenario"   aria-selected="true">Scenario</button>
+      <button role="tab" data-view="trend"      aria-selected="false">Trend</button>
+      <button role="tab" data-view="check"      aria-selected="false">Claim check</button>
+      <button role="tab" data-view="corrections" aria-selected="false">Corrections</button>
+      <button role="tab" data-view="corpus"     aria-selected="false">Corpus</button>
+    </nav>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="wrap">
+    <p class="eyebrow">GBUS 8255 · Business of AI · Session 3</p>
+    <h1 style="margin-top:10px">Most AI hardware numbers are correct on the vendor page<br>and wrong by the time they reach a spreadsheet.</h1>
+    <p class="lede">Not because anyone is lying — because the figures carry qualifiers that compress away in prose. NVIDIA's headline tensor-core throughput is footnoted <em>“with sparsity”</em> and is exactly twice the dense value. The H100's <em>sparse TF32</em> and its <em>dense BF16</em> are both 989 TFLOPS. SXM and PCIe parts of the same generation have different TDPs. Get one wrong and a data-center model is off by a factor of two while looking entirely plausible. This is a corpus that keeps the qualifiers, and a model built on top of it.</p>
+    <p class="sub" id="hero-meta" style="margin-top:14px"></p>
+  </div>
+</div>
+
+<main class="wrap">
+
+<!-- ══════════ SCENARIO ══════════ -->
+<section class="view stack" id="view-scenario">
+  <div class="model-cols">
+
+    <div class="panel">
+      <h2>Assumptions</h2>
+      <p class="sub">Defaults carry their source. Move anything.</p>
+      <div id="controls"></div>
+      <button class="btn" id="reset" style="width:100%;margin-top:4px">Reset to sourced defaults</button>
+      <p class="note" style="font-size:11px;color:var(--ink-tertiary);margin-top:14px">
+        250 MW is chosen to match Nscale's financed 230 MW Narvik site rather than a round number —
+        the guest for this session runs support for that estate.
+      </p>
+    </div>
+
+    <div class="stack" style="min-width:0">
+      <div class="grid-4" id="tiles"></div>
+
+      <div class="panel">
+        <h2>The assumption that actually moves the answer</h2>
+        <p class="sub">Annual cost impact of each input, swept across its plausible range.</p>
+        <div id="tornado"></div>
+        <div class="callout" style="margin-top:16px" id="dominance"></div>
+      </div>
+
+      <div class="grid-2">
+        <div class="panel">
+          <h2>Capital intensity</h2>
+          <p class="sub">Two independent routes. Reported as a range, not a midpoint.</p>
+          <div id="capex-routes"></div>
+        </div>
+        <div class="panel">
+          <h2>Nameplate vs. delivered</h2>
+          <p class="sub">Peak dense FP4 against MLPerf-sustained throughput.</p>
+          <div id="throughput"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ TREND ══════════ -->
+<section class="view stack" id="view-trend" hidden>
+  <div class="panel">
+    <h2>Huang's Law, re-derived with precision held fixed</h2>
+    <p class="sub">Flagship SXM parts only · dense FP16/BF16 only · the one basis every generation from Pascal to Blackwell publishes.</p>
+    <div class="callout" style="margin:16px 0">
+      <p><strong>Why this matters.</strong> Published “GPU performance over time” curves usually plot each generation's <em>headline</em> number. But the headline format keeps narrowing — FP16, then FP8, then FP4 — and each halving of precision roughly doubles the number without the silicon doing more work. Comparing Blackwell FP4 to Pascal FP16 measures the arrival of new number formats as much as it measures hardware. Holding precision fixed is the only honest version of this chart.</p>
+    </div>
+    <div id="trend-chart"></div>
+    <div class="legend" id="trend-legend"></div>
+  </div>
+
+  <div class="grid-2">
+    <div class="panel">
+      <h2>Doubling time</h2>
+      <p class="sub">Fitted on the dense FP16/BF16 series above.</p>
+      <div id="doubling"></div>
+    </div>
+    <div class="panel">
+      <h2>Power and bandwidth, like-for-like</h2>
+      <p class="sub">Flagship SXM parts only — the comparison the book's Ch. 19 table does not make.</p>
+      <div class="tbl-scroll"><table id="trend-table"></table></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ CLAIM CHECK ══════════ -->
+<section class="view stack" id="view-check" hidden>
+  <div class="panel">
+    <h2>Claim checker</h2>
+    <p class="sub">Paste a throughput or power figure. It reports every part, precision and variant the number is consistent with — and flags where it is ambiguous.</p>
+    <div class="grid-2" style="align-items:end;margin-top:16px">
+      <div>
+        <label class="sub" for="claim-val" style="display:block;margin-bottom:6px">Value</label>
+        <input type="text" id="claim-val" placeholder="e.g. 989  ·  1979  ·  700  ·  720">
+      </div>
+      <div>
+        <label class="sub" for="claim-unit" style="display:block;margin-bottom:6px">Unit</label>
+        <select id="claim-unit">
+          <option value="tflops">TFLOPS (per GPU)</option>
+          <option value="pflops">PFLOPS (rack-scale)</option>
+          <option value="watts">Watts (TDP)</option>
+          <option value="tbs">TB/s (memory bandwidth)</option>
+        </select>
+      </div>
+    </div>
+    <div id="claim-out" style="margin-top:20px"></div>
+  </div>
+
+  <div class="panel">
+    <h2>The four failure modes</h2>
+    <p class="sub">Each is qualifier loss. The number survives; its meaning does not.</p>
+    <div class="grid-2" id="failure-modes" style="margin-top:16px"></div>
+  </div>
+</section>
+
+<!-- ══════════ CORRECTIONS ══════════ -->
+<section class="view stack" id="view-corrections" hidden>
+  <div class="panel">
+    <h2>Published claims that do not survive checking</h2>
+    <p class="sub">Each entry states the claim, the published counter-evidence, and what does and does not change as a result.</p>
+  </div>
+  <div id="corrections"></div>
+</section>
+
+<!-- ══════════ CORPUS ══════════ -->
+<section class="view stack" id="view-corpus" hidden>
+  <div class="panel">
+    <h2>The corpus</h2>
+    <p class="sub">Sparse and dense are separate fields. Variants are separate records. Unpublished values are empty on purpose.</p>
+    <div class="legend" style="margin:12px 0 18px">
+      <span><span class="tag f">F</span> &nbsp;vendor-published</span>
+      <span><span class="tag r">R</span> &nbsp;credible secondary, named</span>
+      <span><span class="tag t">T</span> &nbsp;my inference</span>
+      <span><span class="tag null">—</span> &nbsp;not published</span>
+    </div>
+    <div class="tbl-scroll"><table id="corpus-table"></table></div>
+  </div>
+  <div class="panel">
+    <h2>Sources</h2>
+    <p class="sub">Every page actually fetched, with access date.</p>
+    <div id="sources"></div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <p style="margin-bottom:8px"><strong style="color:var(--ink-muted)">Hyperscale Ledger</strong> — built for GBUS 8255, UVA Darden. Method and limitations: <a href="METHOD.md">METHOD.md</a> · Source: <a href="https://github.com/bakulbadwal/hyperscale-ledger">github.com/bakulbadwal/hyperscale-ledger</a></p>
+    <p id="foot-meta" style="margin:0"></p>
+  </div>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>

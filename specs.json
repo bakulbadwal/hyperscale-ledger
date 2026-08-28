@@ -1,0 +1,326 @@
+{
+  "meta": {
+    "title": "Hyperscale Ledger — audited NVIDIA datacenter GPU corpus",
+    "verified": "2026-08-28",
+    "sources_count": 10,
+    "convention": "perf_dense and perf_sparse are separate objects. Where NVIDIA prints only a with-sparsity figure and states the halving rule without printing the dense number, dense is computed and flagged in notes. Where NVIDIA states the rule but the value is genuinely absent, dense is null rather than computed.",
+    "tags": {
+      "F": "vendor-published (nvidia.com or an NVIDIA-authored datasheet; mirrors flagged)",
+      "R": "credible secondary, named and linked",
+      "T": "inference by the author",
+      "null": "not published — left empty on purpose"
+    }
+  },
+
+  "parts": [
+    {
+      "id": "p100-sxm", "name": "Tesla P100 SXM2", "architecture": "Pascal", "launch_year": 2016,
+      "form_factor": "SXM2", "flagship": true, "has_tensor_cores": false,
+      "process_node": "16 nm FinFET+", "transistors_b": 15.3,
+      "tdp_w": 300, "tdp_note": null,
+      "memory": { "capacity_gb": 16, "type": "HBM2", "bandwidth_tb_s": 0.732 },
+      "interconnect": "NVLink, 160 GB/s total bidirectional",
+      "perf_dense": { "fp64": 5.3, "fp32": 10.6, "tf32": null, "bf16": null, "fp16": 21.2, "fp8": null, "int8_tops": null },
+      "perf_sparse": null, "sparsity_applies": false,
+      "headline_marketing_tflops": 21.2,
+      "nvidia_headline_convention": "dense (pre-sparsity, pre-tensor-core architecture)",
+      "source_url": "https://www.nvidia.com/content/dam/en-zz/Solutions/Data-Center/tesla-p100/pdf/nvidia-tesla-p100-datasheet.pdf",
+      "source_is_mirror": false, "accessed": "2026-08-28", "confidence": "F",
+      "notes": "NVIDIA datasheet 'Tesla P100 | Oct16'. P100 has NO tensor cores — the 21.2 TFLOPS FP16 is vector (CUDA-core) FP16, not tensor throughput, and is therefore not comparable to later generations' tensor figures. Excluded from the fitted trend for that reason. Transistors/process from NVIDIA's Volta whitepaper GP100 comparison table."
+    },
+    {
+      "id": "p100-pcie", "name": "Tesla P100 PCIe", "architecture": "Pascal", "launch_year": 2016,
+      "form_factor": "PCIe", "flagship": false, "has_tensor_cores": false,
+      "process_node": "16 nm FinFET+", "transistors_b": 15.3,
+      "tdp_w": 250, "tdp_note": null,
+      "memory": { "capacity_gb": 16, "type": "HBM2", "bandwidth_tb_s": 0.732 },
+      "interconnect": "PCIe Gen3 (no NVLink on this form factor)",
+      "perf_dense": { "fp64": 4.7, "fp32": 9.3, "tf32": null, "bf16": null, "fp16": 18.7, "fp8": null, "int8_tops": null },
+      "perf_sparse": null, "sparsity_applies": false,
+      "nvidia_headline_convention": "dense (pre-sparsity, pre-tensor-core architecture)",
+      "source_url": "https://www.nvidia.com/content/dam/en-zz/Solutions/Data-Center/tesla-p100/pdf/nvidia-tesla-p100-PCIe-datasheet.pdf",
+      "source_is_mirror": false, "accessed": "2026-08-28", "confidence": "F",
+      "notes": "A 12GB / 549 GB/s SKU of the same card also existed per the same datasheet line. No NVLink row at all on the PCIe datasheet — only PCIe Gen3."
+    },
+    {
+      "id": "v100-sxm", "name": "Tesla V100 SXM2", "architecture": "Volta", "launch_year": 2017,
+      "form_factor": "SXM2", "flagship": true, "has_tensor_cores": true,
+      "process_node": "TSMC 12 nm FFN", "transistors_b": 21.1,
+      "tdp_w": 300, "tdp_note": null,
+      "memory": { "capacity_gb": 16, "type": "HBM2", "bandwidth_tb_s": 0.9 },
+      "interconnect": "NVLink 2nd gen, 300 GB/s total bidirectional",
+      "perf_dense": { "fp64": 7.8, "fp32": 15.7, "tf32": null, "bf16": null, "fp16": 125, "fp8": null, "int8_tops": null },
+      "perf_sparse": null, "sparsity_applies": false,
+      "headline_marketing_tflops": 125,
+      "nvidia_headline_convention": "dense (structured sparsity arrives with Ampere)",
+      "source_url": "https://images.nvidia.com/content/technologies/volta/pdf/volta-v100-datasheet-update-us-1165301-r5.pdf",
+      "source_is_mirror": false, "accessed": "2026-08-28", "confidence": "F",
+      "notes": "The 125 TFLOPS 'Tensor Performance' figure is tensor-core FP16 with FP32 accumulate — the first generation directly comparable to later dense tensor figures. 16 GB is the 2017 launch config; a 32 GB variant followed in 2018 at the same 900 GB/s. Transistors/process from NVIDIA's Volta whitepaper."
+    },
+    {
+      "id": "v100-pcie", "name": "Tesla V100 PCIe", "architecture": "Volta", "launch_year": 2017,
+      "form_factor": "PCIe", "flagship": false, "has_tensor_cores": true,
+      "process_node": "TSMC 12 nm FFN", "transistors_b": 21.1,
+      "tdp_w": 250, "tdp_note": null,
+      "memory": { "capacity_gb": 16, "type": "HBM2", "bandwidth_tb_s": 0.9 },
+      "interconnect": "PCIe Gen3, 32 GB/s",
+      "perf_dense": { "fp64": 7, "fp32": 14, "tf32": null, "bf16": null, "fp16": 112, "fp8": null, "int8_tops": null },
+      "perf_sparse": null, "sparsity_applies": false,
+      "nvidia_headline_convention": "dense",
+      "source_url": "https://images.nvidia.com/content/technologies/volta/pdf/volta-v100-datasheet-update-us-1165301-r5.pdf",
+      "source_is_mirror": false, "accessed": "2026-08-28", "confidence": "F",
+      "notes": "Same GV100 die as SXM2, lower clocked and lower power: 112 vs 125 TFLOPS tensor FP16, 250 vs 300 W. A clean illustration of why variant substitution fabricates trends."
+    },
+    {
+      "id": "a100-80gb-sxm", "name": "A100 80GB SXM", "architecture": "Ampere", "launch_year": 2020,
+      "form_factor": "SXM4", "flagship": true, "has_tensor_cores": true,
+      "process_node": "TSMC 7nm N7", "transistors_b": 54.2,
+      "tdp_w": 400, "tdp_note": "400W standard; HGX A100-80GB custom thermal solution SKU up to 500W",
+      "memory": { "capacity_gb": 80, "type": "HBM2e", "bandwidth_tb_s": 2.039 },
+      "interconnect": "NVLink 600 GB/s; PCIe Gen4 64 GB/s",
+      "perf_dense": { "fp64": 9.7, "fp64_tc": 19.5, "fp32": 19.5, "tf32": 156, "bf16": 312, "fp16": 312, "fp8": null, "int8_tops": 624 },
+      "perf_sparse": { "tf32": 312, "bf16": 624, "fp16": 624, "fp8": null, "int8_tops": 1248 },
+      "sparsity_applies": true, "sparsity_footnote": "* With sparsity",
+      "headline_marketing_tflops": 624,
+      "nvidia_headline_convention": "prints BOTH figures as 'X | Y*' — dense unmarked, sparse asterisked",
+      "source_url": "https://www.nvidia.com/en-us/data-center/a100/",
+      "source_is_mirror": false, "accessed": "2026-08-28", "confidence": "F",
+      "notes": "Dense values are PRINTED by NVIDIA here, not computed — the A100 page shows 'X TFLOPS | Y TFLOPS*' pairs. This differs from the H100 page, which prints the sparse figure only. Ampere has no FP8 tensor core. Transistors/process from NVIDIA's Ampere architecture blog (not on the spec page)."
+    },
+    {
+      "id": "a100-80gb-pcie", "name": "A100 80GB PCIe", "architecture": "Ampere", "launch_year": 2020,
+      "form_factor": "PCIe", "flagship": false, "has_tensor_cores": true,
+      "process_node": "TSMC 7nm N7", "transistors_b": 54.2,
+      "tdp_w": 300, "tdp_note": "300W (no footnote qualifier on this row)",
+      "memory": { "capacity_gb": 80, "type": "HBM2e", "bandwidth_tb_s": 1.935 },
+      "interconnect": "NVLink Bridge for 2 GPUs 600 GB/s; PCIe Gen4 64 GB/s",
+      "perf_dense": { "fp64": 9.7, "fp64_tc": 19.5, "fp32": 19.5, "tf32": 156, "bf16": 312, "fp16": 312, "fp8": null, "int8_tops": 624 },
+      "perf_sparse": { "tf32": 312, "bf16": 624, "fp16": 624, "fp8": null, "int8_tops": 1248 },
+      "sparsity_applies": true, "sparsity_footnote": "* With sparsity",
+      "nvidia_headline_convention": "prints BOTH figures as 'X | Y*'",
+      "source_url": "https://www.nvidia.com/en-us/data-center/a100/",
+      "source_is_mirror": false, "accessed": "2026-08-28", "confidence": "F",
+      "notes": "NVIDIA publishes IDENTICAL compute figures for 80GB PCIe and 80GB SXM — only memory bandwidth, TDP, form factor and interconnect differ. So on A100 the variant trap is a POWER and BANDWIDTH trap, not a throughput one."
+    },
+    {
+      "id": "h100-sxm", "name": "H100 SXM", "architecture": "Hopper", "launch_year": 2022,
+      "form_factor": "SXM", "flagship": true, "has_tensor_cores": true,
+      "process_node": "TSMC 4N (custom)", "transistors_b": 80,
+      "tdp_w": 700, "tdp_note": "Up to 700W (configurable)",
+      "memory": { "capacity_gb": 80, "type": "HBM3", "bandwidth_tb_s": 3.35 },
+      "interconnect": "NVLink 900 GB/s; PCIe Gen5 128 GB/s",
+      "perf_dense": { "fp64": 34, "fp64_tc": 67, "fp32": 67, "tf32": 494.5, "bf16": 989.5, "fp16": 989.5, "fp8": 1979, "int8_tops": 1979 },
+      "perf_sparse": { "tf32": 989, "bf16": 1979, "fp16": 1979, "fp8": 3958, "int8_tops": 3958 },
+      "sparsity_applies": true, "sparsity_footnote": "* With sparsity",
+      "headline_marketing_tflops": 3958,
+      "nvidia_headline_convention": "prints ONLY the with-sparsity figure, asterisked — no dense column",
+      "source_url": "https://www.nvidia.com/en-us/data-center/h100/",
+      "source_is_mirror": false, "accessed": "2026-08-28", "confidence": "F",
+      "notes": "Dense values COMPUTED as exactly half the printed sparse figure, per NVIDIA's own stated convention — they are not printed anywhere on the page. Note the trap: sparse TF32 (989) and dense BF16 (989.5) are the same number to three significant figures, so 'the H100 does 989 teraflops' is ambiguous without further qualification. Transistors/process from NVIDIA's Hopper architecture blog."
+    },
+    {
+      "id": "h100-nvl", "name": "H100 NVL", "architecture": "Hopper", "launch_year": 2022,
+      "form_factor": "PCIe dual-slot air-cooled", "flagship": false, "has_tensor_cores": true,
+      "process_node": "TSMC 4N (custom)", "transistors_b": 80,
+      "tdp_w": 400, "tdp_note": "350-400W (configurable)",
+      "memory": { "capacity_gb": 94, "type": "HBM3", "bandwidth_tb_s": 3.9 },
+      "interconnect": "NVLink 600 GB/s; PCIe Gen5 128 GB/s",
+      "perf_dense": { "fp64": 30, "fp64_tc": 60, "fp32": 60, "tf32": 417.5, "bf16": 835.5, "fp16": 835.5, "fp8": 1670.5, "int8_tops": 1670.5 },
+      "perf_sparse": { "tf32": 835, "bf16": 1671, "fp16": 1671, "fp8": 3341, "int8_tops": 3341 },
+      "sparsity_applies": true, "sparsity_footnote": "* With sparsity",
+      "nvidia_headline_convention": "prints ONLY the with-sparsity figure, asterisked",
+      "source_url": "https://www.nvidia.com/en-us/data-center/h100/",
+      "source_is_mirror": false, "accessed": "2026-08-28", "confidence": "F",
+      "notes": "THE VARIANT TRAP, CONCRETELY: 350–400 W against the SXM part's 700 W, on the same generation and the same GH100 die. Substituting this TDP into a flagship series understates the generation by roughly half. Per-GPU figures as printed; NVIDIA sells H100 NVL as a matched NVLink-bridged pair."
+    },
+    {
+      "id": "h200-sxm", "name": "H200 SXM", "architecture": "Hopper", "launch_year": 2023,
+      "form_factor": "SXM", "flagship": true, "has_tensor_cores": true,
+      "process_node": "TSMC 4N (custom)", "transistors_b": 80,
+      "tdp_w": 700, "tdp_note": "Up to 700W (configurable)",
+      "memory": { "capacity_gb": 141, "type": "HBM3e", "bandwidth_tb_s": 4.8 },
+      "interconnect": "NVLink 900 GB/s; PCIe Gen5 128 GB/s",
+      "perf_dense": { "fp64": 34, "fp64_tc": 67, "fp32": 67, "tf32": 494.5, "bf16": 989.5, "fp16": 989.5, "fp8": 1979, "int8_tops": 1979 },
+      "perf_sparse": { "tf32": 989, "bf16": 1979, "fp16": 1979, "fp8": 3958, "int8_tops": 3958 },
+      "sparsity_applies": true, "sparsity_footnote": "With sparsity.",
+      "nvidia_headline_convention": "prints ONLY the with-sparsity figure",
+      "source_url": "https://www.nvidia.com/en-us/data-center/h200/",
+      "source_is_mirror": false, "accessed": "2026-08-28", "confidence": "F",
+      "notes": "IDENTICAL COMPUTE TO H100. Every tensor and vector figure matches H100 SXM exactly — same GH100 die. The entire H200 uplift is memory: 80→141 GB and 3.35→4.8 TB/s. Counting H200 as a compute generation implies throughput progress that did not occur; the trend line is deliberately flat 2022→2023 for this reason."
+    },
+    {
+      "id": "h200-nvl", "name": "H200 NVL", "architecture": "Hopper", "launch_year": 2023,
+      "form_factor": "PCIe dual-slot air-cooled", "flagship": false, "has_tensor_cores": true,
+      "process_node": "TSMC 4N (custom)", "transistors_b": 80,
+      "tdp_w": 600, "tdp_note": "Up to 600W (configurable)",
+      "memory": { "capacity_gb": 141, "type": "HBM3e", "bandwidth_tb_s": 4.8 },
+      "interconnect": "2- or 4-way NVLink bridge 900 GB/s per GPU; PCIe Gen5 128 GB/s",
+      "perf_dense": { "fp64": 30, "fp64_tc": 60, "fp32": 60, "tf32": 417.5, "bf16": 835.5, "fp16": 835.5, "fp8": 1670.5, "int8_tops": 1670.5 },
+      "perf_sparse": { "tf32": 835, "bf16": 1671, "fp16": 1671, "fp8": 3341, "int8_tops": 3341 },
+      "sparsity_applies": true, "sparsity_footnote": "With sparsity.",
+      "nvidia_headline_convention": "prints ONLY the with-sparsity figure",
+      "source_url": "https://www.nvidia.com/en-us/data-center/h200/",
+      "source_is_mirror": false, "accessed": "2026-08-28", "confidence": "F",
+      "notes": "Same memory as H200 SXM (141 GB / 4.8 TB/s); differs in TDP (600 W), form factor and interconnect topology."
+    },
+    {
+      "id": "b200-sxm", "name": "B200", "architecture": "Blackwell", "launch_year": 2024,
+      "form_factor": "SXM/HGX", "flagship": true, "has_tensor_cores": true,
+      "process_node": "TSMC 4NP (custom)", "transistors_b": 208,
+      "tdp_w": 1000, "tdp_note": "Configurable up to 1,000W in HGX B200 (air-cooled). The same Blackwell die is configurable up to 1,200W in the liquid-cooled GB200 NVL72 platform — two platforms, not a conflict.",
+      "memory": { "capacity_gb": 180, "type": "HBM3e", "bandwidth_tb_s": 7.7 },
+      "interconnect": "NVLink 5th gen 1.8 TB/s per GPU; PCIe Gen5 128 GB/s",
+      "perf_dense": { "fp64": 37, "fp32": 75, "tf32": 1100, "bf16": 2250, "fp16": 2250, "fp8": 4500, "fp4": 9000, "int8_tops": 4500 },
+      "perf_sparse": { "tf32": 2200, "bf16": 4500, "fp16": 4500, "fp8": 9000, "fp4": 18000, "int8_tops": 9000 },
+      "sparsity_applies": true,
+      "sparsity_footnote": "Preliminary specifications, subject to change. All Tensor Core numbers except FP64 with sparsity.",
+      "headline_marketing_tflops": 18000,
+      "nvidia_headline_convention": "with sparsity",
+      "source_url": "https://www.primeline-solutions.com/media/categories/server/nach-gpu/nvidia-blackwell-b200-datasheet.pdf",
+      "source_is_mirror": true, "accessed": "2026-08-28", "confidence": "F",
+      "notes": "MIRROR SOURCE, FLAGGED: this is an NVIDIA-authored document ('NVIDIA Blackwell | Datasheet', doc 3384703.Dec24, © 2024 NVIDIA) verified by direct PDF text extraction, but retrieved from a third-party host because NVIDIA's own download pages are login-gated. Figures converted from the source's PFLOPS to TFLOPS for unit consistency. FP8 and FP6 share one published row. 208B transistors is the full dual-die package, not a single reticle-limited die."
+    },
+
+    {
+      "id": "gb200-nvl72", "name": "GB200 NVL72", "architecture": "Blackwell", "launch_year": 2024,
+      "form_factor": "rack-scale", "flagship": false, "gpu_count": 72, "cpu_count": 36,
+      "cpu_detail": "2,592 Arm Neoverse V2 cores (rack total)",
+      "process_node": "TSMC 4NP (custom)", "transistors_b": 208,
+      "rack_power_kw_nvidia": null,
+      "rack_power_kw_reported": [
+        { "value": 120, "source_url": "https://www.theregister.com/2024/03/21/nvidia_dgx_gb200_nvk72/", "label": "The Register — nominal spec, NOT an NVIDIA figure" },
+        { "value": 132, "source_url": "https://www.vertiv.com/en-emea/about/news-and-insights/news-releases/vertiv-codevelops-with-nvidia-complete-power-and-cooling-blueprint-for--nvidia-gb200-nvl72-platform/", "label": "Vertiv reference architecture, co-developed with NVIDIA — 'up to 132kW per rack'" }
+      ],
+      "memory": { "capacity_tb": 13.4, "type": "HBM3E", "bandwidth_tb_s": 576 },
+      "cpu_memory": "17 TB LPDDR5X | 14 TB/s",
+      "interconnect": "NVLink 5th gen / NVLink Switch System — 130 TB/s aggregate rack-wide",
+      "perf_dense_pflops": { "nvfp4": 720, "fp8": null, "fp16_bf16": null, "tf32": null, "fp32": 5.76, "fp64": 2.88, "int8_pops": null },
+      "perf_sparse_pflops": { "nvfp4": 1440, "fp8": 720, "fp16_bf16": 360, "tf32": 180, "int8_pops": 720 },
+      "sparsity_applies": true,
+      "sparsity_footnote": "1. Specification in sparse | dense. 2. Specification in sparse. Dense is one-half sparse spec shown.",
+      "nvidia_headline_convention": "NVFP4 given as an explicit pair '1,440 | 720 PFLOPS'. FP8/FP6, INT8, FP16/BF16 and TF32 show ONE number each (sparse) with the halving rule stated in a footnote — the dense values are never printed. Recorded as null rather than computed.",
+      "source_url": "https://www.nvidia.com/en-us/data-center/gb200-nvl72/",
+      "source_is_mirror": false, "accessed": "2026-08-28", "confidence": "F",
+      "published_status": "fully specified",
+      "notes": "NVIDIA PUBLISHES NO RACK POWER FIGURE — neither on the product page nor in the official Blackwell datasheet PDF (both checked directly). The ~120 kW / 132 kW figures in universal circulation are third-party. Rack-level figures independently confirmed against the NVIDIA datasheet's per-GPU table (FP32 80 TFLOPS × 72 = 5,760 exactly; FP64 40 × 72 = 2,880 exactly; INT8 10 POPS × 72 = 720 exactly). Minor inconsistency inside NVIDIA's own collateral: the datasheet cover says 'up to 13.5 TB of HBM3E' while its own spec table and the live page say 13.4 TB."
+    },
+    {
+      "id": "gb300-nvl72", "name": "GB300 NVL72", "architecture": "Blackwell Ultra", "launch_year": 2025,
+      "form_factor": "rack-scale", "flagship": false, "gpu_count": 72, "cpu_count": 36,
+      "cpu_detail": "2,592 Arm Neoverse V2 cores (rack total) — unchanged from GB200 NVL72",
+      "process_node": "TSMC 4NP", "transistors_b": 208,
+      "rack_power_kw_nvidia": null,
+      "rack_power_kw_reported": [
+        { "value": 135, "source_url": "https://lenovopress.lenovo.com/lp2357-lenovo-nvidia-gb300-nvl72-rack-scale-ai", "label": "Lenovo Press — '135 kW TDP per rack', NOT an NVIDIA figure" },
+        { "value": 155, "source_url": "https://lenovopress.lenovo.com/lp2357-lenovo-nvidia-gb300-nvl72-rack-scale-ai", "label": "Lenovo Press — 'up to 155 kW peak depending on workload'" }
+      ],
+      "memory": { "capacity_tb": 20, "type": "HBM3E", "bandwidth_tb_s": 576 },
+      "cpu_memory": "17 TB LPDDR5X | 14 TB/s",
+      "interconnect": "NVLink 5th gen — 130 TB/s rack-wide, unchanged from GB200 NVL72",
+      "perf_dense_pflops": { "nvfp4": 1080, "fp8": null, "fp16_bf16": null, "tf32": null, "fp32": 6, "fp64": 0.1, "int8_pops": null },
+      "perf_sparse_pflops": { "nvfp4": 1440, "fp8": 720, "fp16_bf16": 360, "tf32": 180, "int8_pops": 24 },
+      "sparsity_applies": true,
+      "sparsity_footnote": "Product page: '1. All Tensor Core specifications are with sparsity unless otherwise noted. 2. Without sparsity.' — but NVIDIA's own Blackwell Ultra datasheet PDF words the SAME rule differently: '1. Specification in Sparse | Dense. 2. Specification in sparse. Dense is 1/2 sparse spec shown.'",
+      "nvidia_headline_convention": "FP4 shown as '1440 | 1080 PFLOPS' with 1080 marked 'without sparsity'. Other tensor rows show one unmarked (sparse) number with no dense figure printed.",
+      "source_url": "https://www.nvidia.com/en-us/data-center/gb300-nvl72/",
+      "source_is_mirror": false, "accessed": "2026-08-28", "confidence": "F",
+      "published_status": "fully specified",
+      "notes": "TWO VERIFIED REGRESSIONS. Rack INT8 falls from 720 POPS (GB200) to 24 POPS — confirmed via the Blackwell Ultra datasheet's per-GPU figure of 330 TOPS (330 × 72 = 23.76 POPS ≈ 24). Rack FP64 falls from 2,880 TFLOPS to ~100 TFLOPS (per-GPU 40 → 1.3 TFLOPS). Both roughly 30× cuts, reflecting die area reallocated toward FP4/FP6 and attention acceleration. A newer generation is NOT uniformly faster — it is faster at the precisions it was optimised for and dramatically slower at others. Per-GPU TDP configurable up to 1,400 W (vs 1,200 W for Blackwell); NVIDIA publishes no rack kW."
+    },
+    {
+      "id": "vera-rubin-nvl72", "name": "Vera Rubin NVL72", "architecture": "Rubin", "launch_year": 2025,
+      "form_factor": "rack-scale", "flagship": false, "gpu_count": 72, "cpu_count": 36,
+      "cpu_detail": "3,168 custom NVIDIA Olympus cores (rack total) — a change from Grace's off-the-shelf Arm Neoverse V2",
+      "process_node": null, "transistors_b": null,
+      "rack_power_kw_nvidia": null,
+      "rack_power_kw_reported": [
+        { "value": 190, "source_url": "https://hashrateindex.com/blog/nvidia-vera-rubin-nvl72-specs-breakdown/", "label": "Hashrate Index — '~190 kW (Max Q)', third-party estimate on a preliminary spec" },
+        { "value": 230, "source_url": "https://hashrateindex.com/blog/nvidia-vera-rubin-nvl72-specs-breakdown/", "label": "Hashrate Index — '~230 kW (Max P)', third-party estimate" }
+      ],
+      "memory": { "capacity_tb": 20.7, "type": "HBM4", "bandwidth_tb_s": 1580 },
+      "cpu_memory": "54 TB LPDDR5X (rack total); no bandwidth figure published",
+      "interconnect": "NVLink 6th gen — 260 TB/s rack-wide; NVLink-C2C 65 TB/s",
+      "perf_dense_pflops": { "nvfp4": 2520, "fp8": 1260, "fp16_bf16": 288, "tf32": 144, "fp32": 9.36, "fp64": 2.4, "int8_pops": 18 },
+      "perf_sparse_pflops": { "nvfp4": 3600, "fp8": null, "fp16_bf16": null, "tf32": null, "int8_pops": null },
+      "sparsity_applies": true,
+      "sparsity_footnote": "1. Preliminary information. All values are up to and subject to change. 2. Dense specification. 3. Peak performance using Tensor Core-based emulation algorithms.",
+      "nvidia_headline_convention": "A THIRD convention: NVFP4 splits into separate 'Inference' (3,600) and 'Training' (2,520, marked dense) rows rather than sparse|dense. Other precisions publish a 'Training' (dense) row only, with no sparse counterpart at all.",
+      "source_url": "https://www.nvidia.com/en-us/data-center/vera-rubin-nvl72/",
+      "source_is_mirror": false, "accessed": "2026-08-28", "confidence": "F",
+      "published_status": "partially specified",
+      "notes": "NVIDIA's own product page names this 'Vera Rubin NVL72', not the widely-used media 'NVL144' (which counts the 144 individual dies — each Rubin package integrates two). Every figure carries NVIDIA's own footnote 1: 'Preliminary information... subject to change'. NOT PUBLISHED, left null: rack power, transistor count, process node — third-party sources report ~336B on TSMC N3, but that appears on no NVIDIA page we fetched, so it is excluded. TRAP: the page's FP32 SGEMM (28,800 TFLOPS) and FP64 DGEMM (14,400 TFLOPS) figures are Tensor-Core EMULATED, not native; native FP32 is 9,360 and FP64 is 2,400 TFLOPS. Comparing the emulated figures against earlier generations' native FP64 would overstate by ~6×."
+    }
+  ],
+
+  "failure_modes": [
+    {
+      "id": "01",
+      "name": "The sparsity asterisk goes missing",
+      "what": "NVIDIA's headline tensor-core figures are footnoted 'with sparsity' and are exactly twice the dense value. Strip the asterisk and throughput doubles.",
+      "example": "H100 SXM is quoted at 1,979 TFLOPS BF16. Dense is 989.5. Worse: the H100 page prints only the sparse number, so the dense figure appears nowhere on it — you have to know the rule and halve it yourself."
+    },
+    {
+      "id": "02",
+      "name": "The convention changes between generations",
+      "what": "The safety rail moved. A100 printed both dense and sparse; H100 prints sparse only; GB200 prints a pair for one precision and a footnoted rule for the rest; Vera Rubin abandons sparse|dense entirely for Inference/Training rows.",
+      "example": "Four NVIDIA generations, four presentation conventions. For GB300, NVIDIA's product page and its own datasheet PDF state the same rule in different words."
+    },
+    {
+      "id": "03",
+      "name": "Variant substitution",
+      "what": "SXM and PCIe parts of one generation differ in TDP, bandwidth and sometimes clocks. Mixing them across a series fabricates a trend that no product line actually followed.",
+      "example": "H100 SXM is up to 700 W; H100 NVL is 350–400 W. Same generation, same die, half the power. Substituting the PCIe figure into a flagship ladder understates the generation by roughly half."
+    },
+    {
+      "id": "04",
+      "name": "Denominator splicing",
+      "what": "A share-of-total computed on one basis gets attached to a number computed on another. The sentence reads fluently and is arithmetically self-refuting.",
+      "example": "A widely syndicated summary: a 1 GW facility has '$38 B upfront capex, of which $5 B (60%) is servers and GPUs.' $5 B is 13% of $38 B. The 60% is the annualized-TCO share, fused onto the upfront-capex figure."
+    }
+  ],
+
+  "corrections": [
+    {
+      "source": "The Thinking Machine · Stephen Witt · Ch. 19 'Power'",
+      "title": "The book's GPU power ladder mixes product lines",
+      "claim": "Chapter 19 presents the escalation of AI power draw as a single series: <span class=\"mono\">A100 250 W → H100 350 W → B100 700 W → B200 1,000 W</span>. The chapter's argument is that per-chip power is exploding.",
+      "evidence": "NVIDIA publishes A100 80GB SXM at <strong>400 W</strong> and H100 SXM at <strong>up to 700 W</strong>. The 350 W figure corresponds to the H100 NVL / PCIe variant (350–400 W), not the SXM part. The first two rungs are entry or PCIe variants; the last two are flagship parts.",
+      "table": {
+        "head": [{ "t": "Part" }, { "t": "Witt, Ch. 19", "n": true }, { "t": "NVIDIA published (SXM)", "n": true }, { "t": "What Witt's figure matches" }],
+        "rows": [
+          ["A100", "250 W", "400 W", "neither 80GB variant — 300 W PCIe is closest; 250 W is the older 40GB PCIe part <span class=\"tag t\">T</span>"],
+          ["H100", "350 W", "700 W", "the H100 NVL / PCIe variant (350–400 W)"],
+          ["B100", "700 W", "700 W", "correct"],
+          ["B200", "1,000 W", "1,000 W", "correct (HGX air-cooled; 1,200 W liquid in GB200 NVL72)"]
+        ]
+      },
+      "impact": "Compared like-for-like, the flagship SXM ladder is 400 → 700 → 1,000 W — a <strong>2.5× rise across two generations, not the 4×</strong> the table implies. The direction of Witt's argument survives; its slope does not. That this occurs in the chapter specifically about power is the point: these numbers are hard to handle even for a careful reporter with access.",
+      "sources": [
+        { "url": "https://www.nvidia.com/en-us/data-center/a100/", "label": "NVIDIA A100" },
+        { "url": "https://www.nvidia.com/en-us/data-center/h100/", "label": "NVIDIA H100" }
+      ]
+    },
+    {
+      "source": "Common assumption · widely repeated",
+      "title": "“Each generation is faster than the last”",
+      "claim": "Successive GPU generations are treated as uniformly faster, so a later part can be substituted for an earlier one in any performance comparison.",
+      "evidence": "Blackwell Ultra (GB300 NVL72) is roughly <strong>30× slower than Blackwell (GB200 NVL72) at INT8</strong> — 24 POPS per rack against 720 — and roughly <strong>30× slower at FP64</strong>, per-GPU 1.3 TFLOPS against 40. Both confirmed against NVIDIA's own Blackwell Ultra datasheet. Die area was reallocated toward FP4/FP6 and attention acceleration.",
+      "impact": "“GPU performance” is not one number and it is not monotonic. A newer part is faster at the precisions it was optimised for and can be dramatically slower at others. Any single-number performance trend implicitly picks a precision — and which one it picks determines the answer.",
+      "sources": [
+        { "url": "https://www.nvidia.com/en-us/data-center/gb300-nvl72/", "label": "NVIDIA GB300 NVL72" },
+        { "url": "https://www.nvidia.com/en-us/data-center/gb200-nvl72/", "label": "NVIDIA GB200 NVL72" }
+      ]
+    },
+    {
+      "source": "Universal in secondary coverage",
+      "title": "“The GB200 NVL72 rack draws 120 kW”",
+      "claim": "A specific rack power figure — usually 120 kW, sometimes 132 kW — is quoted as though it were an NVIDIA specification.",
+      "evidence": "NVIDIA publishes <strong>no rack power figure at all</strong> for GB200 NVL72, on either the product page or the official Blackwell datasheet PDF. Both were checked directly. The 120 kW figure traces to trade press; 132 kW to a Vertiv reference architecture co-developed with NVIDIA. Neither is an NVIDIA-published number. The same is true of GB300 (135–155 kW, Lenovo) and Vera Rubin (190–230 kW, third-party estimate on a spec NVIDIA itself labels preliminary).",
+      "impact": "The single most load-bearing input in any data-center capacity model — how much power a rack draws — is not vendor-published. Every downstream figure inherits that. It should be tagged <span class=\"tag r\">R</span>, carried as a range, and treated as the first thing to ask an operator about.",
+      "sources": [
+        { "url": "https://www.nvidia.com/en-us/data-center/gb200-nvl72/", "label": "NVIDIA GB200 NVL72" },
+        { "url": "https://www.vertiv.com/en-emea/about/news-and-insights/news-releases/vertiv-codevelops-with-nvidia-complete-power-and-cooling-blueprint-for--nvidia-gb200-nvl72-platform/", "label": "Vertiv" }
+      ]
+    }
+  ]
+}
