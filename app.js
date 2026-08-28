@@ -430,12 +430,23 @@ function renderCorpus() {
 
 /* ══════════════════ boot ══════════════════ */
 
+const VIEWS = ["scenario", "trend", "check", "corrections", "corpus"];
+
+function showView(name, { scroll = true, setHash = true } = {}) {
+  if (!VIEWS.includes(name)) name = "scenario";
+  $$("#tabs button").forEach(b => b.setAttribute("aria-selected", String(b.dataset.view === name)));
+  $$(".view").forEach(v => v.hidden = v.id !== "view-" + name);
+  if (setHash && location.hash.slice(1) !== name) history.replaceState(null, "", "#" + name);
+  if (scroll) window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
 function tabs() {
-  $$("#tabs button").forEach(b => b.addEventListener("click", () => {
-    $$("#tabs button").forEach(x => x.setAttribute("aria-selected", String(x === b)));
-    $$(".view").forEach(v => v.hidden = v.id !== "view-" + b.dataset.view);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }));
+  // Hash routing so every view is directly linkable — /#trend, /#corrections, etc.
+  $$("#tabs button").forEach(b =>
+    b.addEventListener("click", () => showView(b.dataset.view)));
+  window.addEventListener("hashchange", () =>
+    showView(location.hash.slice(1), { scroll: false, setHash: false }));
+  showView(location.hash.slice(1) || "scenario", { scroll: false });
 }
 
 async function boot() {

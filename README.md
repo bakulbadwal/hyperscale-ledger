@@ -1,46 +1,71 @@
+<div align="center">
+
 # Hyperscale Ledger
 
-**An audited specification corpus for NVIDIA datacenter GPUs, and a 2027 hyperscale data-center scenario model built on top of it.**
+**An audited specification corpus for NVIDIA datacenter GPUs — and a 2027 hyperscale data-center scenario model built on top of it.**
 
-Built for GBUS 8255 (Business of AI Reading Seminar), UVA Darden — Session 3, *The Thinking Machine* (Stephen Witt), on GPUs and data centers.
+[![Live](https://img.shields.io/badge/live-bakulbadwal.github.io%2Fhyperscale--ledger-4739c4?style=flat-square)](https://bakulbadwal.github.io/hyperscale-ledger/)
+[![Records](https://img.shields.io/badge/corpus-15%20records%20%C2%B7%2010%20sources-1f7a3d?style=flat-square)](specs.json)
+[![Method](https://img.shields.io/badge/method-documented-6a6a78?style=flat-square)](METHOD.md)
+[![License: MIT](https://img.shields.io/badge/license-MIT-6a6a78?style=flat-square)](LICENSE)
 
-**Live:** https://bakulbadwal.github.io/hyperscale-ledger/
+### [→ Open the live model](https://bakulbadwal.github.io/hyperscale-ledger/)
+
+<img src="docs/hero.png" alt="Hyperscale Ledger — the 2027 scenario model, with every assumption exposed as a control" width="100%">
+
+</div>
 
 ---
 
-## The problem it addresses
+## Why this exists
 
 Almost every published figure about AI hardware is correct on the vendor's page and wrong by the time it reaches a spreadsheet. Not because anyone is lying — because the numbers carry **qualifiers that compress away in prose**.
 
-NVIDIA's headline tensor-core throughput figures are footnoted "With sparsity" and are exactly **twice** the dense value. The H100's *sparse TF32* and its *dense BF16* are **both 989 TFLOPS**, so the two are conflated constantly. SXM and PCIe variants of the same part have different TDPs. Rack power has a nominal figure and an observed one, 10% apart.
+NVIDIA's headline tensor-core figures are footnoted *"with sparsity"* and are exactly **twice** the dense value. The H100's *sparse TF32* and its *dense BF16* are **both 989 TFLOPS**, so the two get conflated constantly. SXM and PCIe parts of the same generation have different TDPs. Rack power has a nominal figure and an observed one, 10% apart — and NVIDIA publishes neither.
 
 Get one of those wrong and a data-center model is off by a factor of two while looking entirely plausible.
 
-This repo does two things about that:
+So this repo does two things:
 
-1. **`specs.json`** — a specification corpus where sparse and dense are separate fields, variants are separate records, every value carries a source URL and an access date, and unpublished values are `null` rather than guessed.
-2. **A scenario model** that sits on the corpus and makes the load-bearing assumptions manipulable, so they can be argued with instead of taken on faith.
+1. **[`specs.json`](specs.json)** — a corpus where sparse and dense are separate fields, variants are separate records, every value carries a source URL and an access date, and unpublished values are `null` rather than guessed.
+2. **A scenario model** on top of it, which makes the load-bearing assumptions manipulable so they can be argued with instead of taken on faith.
 
-## The four views
+## The five views
 
-| View | What it does |
-|---|---|
-| **Scenario** | A 250 MW AI campus modelled on GB200 NVL72. Flex GPU useful life, rack power, utilization, power price and rack cost; watch capex, TCO and $/effective-PFLOP move. |
-| **Trend** | Huang's Law re-derived on **dense FP16/BF16, flagship SXM parts only** — precision held fixed across generations — set against the marketing curve and against Epoch AI's measured ~2.5-year doubling. |
-| **Claim checker** | Paste a FLOPS or TDP number; it reports which part, precision and variant it is consistent with, and flags where it is ambiguous. The failure modes, made executable. |
-| **Corrections** | Published claims that do not survive checking — including the GPU power table in Ch. 19 of the assigned book. |
+| | View | What it does |
+|---|---|---|
+| [🔗](https://bakulbadwal.github.io/hyperscale-ledger/#scenario) | **Scenario** | A 250 MW AI campus on GB200 NVL72. Flex GPU useful life, rack power, utilization, power price and rack cost; watch capex, TCO and $/effective-PFLOP move. A tornado chart ranks what actually drives the answer. |
+| [🔗](https://bakulbadwal.github.io/hyperscale-ledger/#trend) | **Trend** | Huang's Law re-derived on **dense FP16/BF16, flagship SXM parts only** — precision held fixed — against the marketing curve and Epoch AI's measured ~2.5-year doubling. |
+| [🔗](https://bakulbadwal.github.io/hyperscale-ledger/#check) | **Claim check** | Paste a FLOPS or TDP figure; it reports every part, precision and variant the number is consistent with, and flags the ambiguity. Try `989`. |
+| [🔗](https://bakulbadwal.github.io/hyperscale-ledger/#corrections) | **Corrections** | Published claims that do not survive checking — including the GPU power table in Ch. 19 of *The Thinking Machine*. |
+| [🔗](https://bakulbadwal.github.io/hyperscale-ledger/#corpus) | **Corpus** | The whole dataset, inspectable, with every source and access date. |
 
 ## Findings
 
-- **Depreciation dominates energy.** On a 250 MW campus, moving GPU useful life from 5 years to 3 swings annual cost by roughly **$830 M** — about **5.6× the entire annual electricity bill** at US industrial rates. The AI-capex debate is conducted almost entirely in the language of power; power is the second-order term.
-- **Nameplate overstates delivered throughput by ~2.55×, not the ~5× usually quoted.** Peak *dense FP8* across the campus is ~750 EFLOPS against ~294 EFLOPS MLPerf-sustained — 39%. The larger figure comes from comparing an FP4 nameplate against an FP8 measurement, which is a precision mismatch, not a utilisation finding. Half the advertised gap is one number-format halving. (My own first draft made exactly this error; it was caught on adversarial review.)
-- **The most load-bearing input in the whole model is not vendor-published.** NVIDIA states no rack power figure for GB200 NVL72 anywhere — the universal 120 kW is trade press, 132 kW is a Vertiv reference architecture.
-- **Holding precision fixed flattens the curve.** Much of the apparent acceleration in "GPU performance over time" is the arrival of narrower number formats, not silicon.
-- **The assigned book's power table mixes product lines.** Witt's Ch. 19 ladder pairs PCIe-variant TDPs with flagship parts; like-for-like the rise is 2.5×, not the 4× implied. Details in the Corrections view.
+**Huang's Law holds — and the published curve still overstates it.** On a fixed-precision basis (V100 → B200, dense BF16 throughout) this line doubles every **1.68 years**, comfortably inside the "more than double every two years" claim. On the headline basis it doubles every **0.98 years** — a curve **1.72× steeper**. That gap is not silicon; it is number formats getting narrower and sparsity being counted, roughly **42%** of the apparent gain.
+
+**Depreciation dominates energy.** On a 250 MW campus, moving GPU useful life from 5 years to 3 swings annual cost by about **$833 M** — roughly **5.6× the entire annual electricity bill** at US industrial rates. The AI-capex debate is conducted almost wholly in the language of power; power is the second-order term.
+
+**The most load-bearing input in the model is not vendor-published.** NVIDIA states **no rack power figure at all** for GB200 NVL72 — not on the product page, not in the Blackwell datasheet. The universally-quoted 120 kW is trade press; 132 kW is a Vertiv reference architecture.
+
+**A newer generation is not uniformly faster.** Blackwell Ultra (GB300) is roughly **30× slower than Blackwell at INT8 and at FP64** — die area reallocated toward FP4/FP6. "GPU performance" is not one number, and any single-number trend implicitly picks a precision.
+
+**Nameplate overstates delivered throughput by ~2.55×, not the ~5× usually quoted.** Peak *dense FP8* is ~750 EFLOPS against ~294 EFLOPS MLPerf-sustained. The larger figure comes from comparing an FP4 nameplate against an FP8 measurement — a precision mismatch, not a utilization finding. *(My own first draft made exactly this error. It was caught on adversarial review and is now documented as failure mode #2 on the site.)*
+
+**The assigned book's power table mixes product lines.** Witt's Ch. 19 ladder quotes four *real* NVIDIA TDPs, but 250 W is the A100 40GB PCIe and 350 W the H100 NVL, while the last two rungs are flagship parts. Like-for-like it is a 2.5× rise, not 4×.
 
 ## Provenance
 
-Every number is tagged **`F`** (vendor-published fact), **`R`** (credible secondary, named and linked), or **`T`** (my inference) — a convention carried over from [ai-stack-field-atlas](https://github.com/bakulbadwal/ai-stack-field-atlas). Unpublished values are `null` on purpose.
+Every value is tagged:
+
+| Tag | Meaning |
+|---|---|
+| **`F`** | Vendor-published — nvidia.com or an NVIDIA-authored datasheet. Mirrors flagged explicitly. |
+| **`R`** | Credible secondary — named and linked. Never presented as vendor-published. |
+| **`T`** | My own inference or model output. Always visibly separated. |
+| `null` | Not published. Left empty on purpose, never filled from memory. |
+
+The corpus was built by **parallel subagents against a fixed schema**, one per GPU generation, forbidden from estimating. The **A100 and H100 records — the two the analysis leans on hardest — were transcribed twice, independently, and diffed.** A final adversarial verification pass recomputed every figure and re-fetched every cited page; it returned three blocking errors, all corrected here.
 
 Full methodology, including the sparse/dense handling and the fixed-precision comparison rule, is in **[METHOD.md](METHOD.md)**.
 
@@ -50,23 +75,32 @@ No framework, no build step, no dependencies — plain HTML/CSS/JS, so it runs a
 
 | File | Role |
 |---|---|
-| `specs.json` | The corpus. Every fact, with provenance. The only file that needs changing when hardware ships. |
-| `index.html` | Page shell. No factual content. |
-| `app.js` | Fetches `specs.json`, renders the four views, runs the model arithmetic. |
-| `styles.css` | Design language, adapted from the Linear DESIGN.md in [awesome-design-md](https://github.com/VoltAgent/awesome-design-md). |
+| [`specs.json`](specs.json) | The corpus. Every fact, with provenance. The only file that changes when hardware ships. |
+| [`index.html`](index.html) | Page shell. No factual content. |
+| [`app.js`](app.js) | Fetches the corpus, renders the five views, runs the model arithmetic — deliberately simple enough to audit by reading. |
+| [`styles.css`](styles.css) | Design language, adapted from the Linear `DESIGN.md` in [awesome-design-md](https://github.com/VoltAgent/awesome-design-md). |
 
-`app.js` fetches `specs.json`, so `file://` will fail on CORS. Serve it:
+`app.js` fetches `specs.json`, so `file://` fails on CORS. Serve it:
 
-```
+```bash
 python3 -m http.server 8000
 ```
 
+Every view is hash-addressable — `#trend`, `#corrections` — so any tab can be linked directly.
+
 ## Honest limits
 
-The corpus covers NVIDIA datacenter parts only — no AMD Instinct, no TPU, no Trainium. Rack pricing is secondary-sourced everywhere and marked as such. MLPerf figures reflect one benchmark on one model at one scale. The scenario model is deliberately simple enough to audit by reading, which also means it is not a substitute for an operator's actual pro forma.
+- NVIDIA datacenter parts only. No AMD Instinct, no TPU, no Trainium.
+- Rack pricing is secondary-sourced everywhere and marked as such; NVIDIA publishes none.
+- MLPerf figures reflect one benchmark, one model, one scale — the run behind the 39% figure was ~2,500 GPUs, which says nothing about a 150,000-GPU fabric.
+- The scenario model is simple enough to audit by reading, which also means it is not a substitute for an operator's pro forma.
+- Vera Rubin figures carry NVIDIA's own *"preliminary, subject to change"* footnote.
 
-Built with Claude Code. Specification transcription was done by parallel subagents against a fixed schema, with the two most load-bearing records independently transcribed twice and diffed; see [METHOD.md](METHOD.md).
+---
 
-## License
+<div align="center">
 
-MIT — see [LICENSE](LICENSE).
+Built for **GBUS 8255 — Business of AI Reading Seminar**, UVA Darden · Session 3, *The Thinking Machine* (Stephen Witt)
+<br>Built with [Claude Code](https://claude.com/claude-code) · MIT licensed
+
+</div>
