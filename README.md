@@ -4,8 +4,8 @@
 
 **An audited specification corpus for NVIDIA datacenter GPUs — and a 2027 hyperscale data-center scenario model built on top of it.**
 
-[![Live](https://img.shields.io/badge/live-bakulbadwal.github.io%2Fhyperscale--ledger-4739c4?style=flat-square)](https://bakulbadwal.github.io/hyperscale-ledger/)
-[![Records](https://img.shields.io/badge/corpus-15%20records%20%C2%B7%2010%20sources-1f7a3d?style=flat-square)](specs.json)
+[![Live](https://img.shields.io/badge/live-bakulbadwal.github.io%2Fhyperscale--ledger-C9A96A?style=flat-square)](https://bakulbadwal.github.io/hyperscale-ledger/)
+[![Records](https://img.shields.io/badge/corpus-15%20records%20%C2%B7%2010%20sources-8FAE6B?style=flat-square)](specs.json)
 [![Method](https://img.shields.io/badge/method-documented-6a6a78?style=flat-square)](METHOD.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-6a6a78?style=flat-square)](LICENSE)
 
@@ -84,7 +84,7 @@ No framework, no build step, no dependencies — plain HTML/CSS/JS, so it runs a
 | [`specs.json`](specs.json) | The corpus. Every fact, with provenance. The only file that changes when hardware ships. |
 | [`index.html`](index.html) | Page shell. No factual content. |
 | [`app.js`](app.js) | Fetches the corpus, renders the five views, runs the model arithmetic — deliberately simple enough to audit by reading. |
-| [`styles.css`](styles.css) | Design language, adapted from the Linear `DESIGN.md` in [awesome-design-md](https://github.com/VoltAgent/awesome-design-md). |
+| [`styles.css`](styles.css) | Design language — deep navy, brass accent, warm paper ink, Fraunces display serif, carried over from [ai-stack-field-atlas](https://github.com/bakulbadwal/ai-stack-field-atlas). |
 
 `app.js` fetches `specs.json`, so `file://` fails on CORS. Serve it:
 
@@ -92,7 +92,7 @@ No framework, no build step, no dependencies — plain HTML/CSS/JS, so it runs a
 python3 -m http.server 8000
 ```
 
-Every view is hash-addressable — `#trend`, `#corrections` — so any tab can be linked directly.
+Every view is hash-addressable — `#trend`, `#corrections` — and every model input can be preset from the query string, so a specific case is linkable: [`?it_mw=400&gpu_life=3`](https://bakulbadwal.github.io/hyperscale-ledger/?it_mw=400&gpu_life=3).
 
 ## Honest limits
 
