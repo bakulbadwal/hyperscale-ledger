@@ -47,8 +47,15 @@ const K = {
   server_share: 0.56,       // Epoch AI: servers = 56% of upfront capex
   epoch_capex_per_mw: 37.883e9 / 1000,
   facility_life: 14,        // Epoch AI
-  peak_fp4_dense_pflops_rack: 720,
-  mlperf_tflops_per_gpu: 1960
+
+  // PRECISION IS HELD FIXED, per METHOD.md. The MLPerf figure below is an FP8-basis
+  // measurement (see specs.json > benchmarks), so peak must also be quoted at dense FP8 —
+  // 360 PFLOPS/rack, half the printed sparse 720. Comparing it against the FP4 nameplate
+  // (720 dense / 1,440 sparse) would compare two different number formats and inflate the
+  // apparent shortfall by exactly 2x. That is the error this whole page is about.
+  peak_dense_pflops_rack: 360,
+  peak_basis: "dense FP8",
+  mlperf_tflops_per_gpu: 1960   // overwritten from specs.json at boot
 };
 
 let S = {};
@@ -70,7 +77,7 @@ function model(s = S) {
   const facilityDep = facilityCapex / K.facility_life;
   const annual = computeDep + facilityDep + energy;
 
-  const peakEF = (racks * K.peak_fp4_dense_pflops_rack) / 1000;
+  const peakEF = (racks * K.peak_dense_pflops_rack) / 1000;
   const sustEF = (gpus * K.mlperf_tflops_per_gpu) / 1e6;
   const costPerEffPflopYr = annual / (sustEF * 1000);
 
@@ -137,11 +144,12 @@ function renderScenario() {
   const ratio = m.peakEF / m.sustEF;
   $("#throughput").innerHTML = `
     <table>
-      <tr><td><strong>Peak, dense FP4</strong><div class="sub">nameplate ${K.peak_fp4_dense_pflops_rack} PFLOPS/rack</div></td><td class="n">${fmt.int(m.peakEF)} EFLOPS</td></tr>
-      <tr><td><strong>MLPerf-sustained</strong><div class="sub">Llama 3.1 405B, ${fmt.int(K.mlperf_tflops_per_gpu)} TFLOPS/GPU</div></td><td class="n">${fmt.int(m.sustEF)} EFLOPS</td></tr>
+      <tr><td><strong>Peak, ${K.peak_basis}</strong><div class="sub">${K.peak_dense_pflops_rack} PFLOPS/rack</div></td><td class="n">${fmt.int(m.peakEF)} EFLOPS</td></tr>
+      <tr><td><strong>MLPerf-sustained</strong><div class="sub">Llama 3.1 405B, ${fmt.int(K.mlperf_tflops_per_gpu)} TFLOPS/GPU — FP8 basis</div></td><td class="n">${fmt.int(m.sustEF)} EFLOPS</td></tr>
       <tr><td><strong>Delivered fraction</strong></td><td class="n">${fmt.pct(m.sustEF / m.peakEF)}</td></tr>
+      <tr><td><strong>Same figure vs. FP4 nameplate</strong><div class="sub">the comparison to avoid</div></td><td class="n">${fmt.pct(m.sustEF / (m.peakEF * 2))}</td></tr>
     </table>
-    <p class="sub" style="margin-top:12px;margin-bottom:0">A model built on nameplate FLOPS overstates delivered capacity by roughly <strong style="color:var(--ink)">${fmt.n1(ratio)}×</strong>.</p>`;
+    <p class="sub" style="margin-top:12px;margin-bottom:0">Like-for-like, nameplate overstates delivered capacity by <strong style="color:var(--ink)">${fmt.n1(ratio)}×</strong>. Quote the same measurement against the <em>FP4</em> nameplate and it becomes ${fmt.n1(ratio * 2)}× — but half that gap is one precision halving, not lost utilisation.</p>`;
 }
 
 /* ---------- tornado ---------- */
@@ -324,7 +332,7 @@ function checkClaim() {
       });
     }
     if (unit === "watts") {
-      if (near(v, p.tdp_w)) push("TDP", p.tdp_w, p.form_factor && /PCIe|NVL/i.test(p.form_factor) ? "PCIe/NVL variant — the SXM part of this generation differs" : null);
+      if (near(v, p.tdp_w) || (p.tdp_range_w && v >= p.tdp_range_w[0]*0.98 && v <= p.tdp_range_w[1]*1.02)) push(p.tdp_range_w ? `TDP (published range ${p.tdp_range_w[0]}-${p.tdp_range_w[1]} W)` : "TDP", p.tdp_w, p.form_factor && /PCIe|NVL/i.test(p.form_factor) ? "PCIe/NVL variant — the SXM part of this generation differs" : null);
       if (p.rack_power_kw_nvidia && near(v, p.rack_power_kw_nvidia * 1000)) push("rack power (NVIDIA)", p.rack_power_kw_nvidia * 1000, "rack-scale");
       (p.rack_power_kw_reported || []).forEach(r => { if (near(v, r.value * 1000)) push("rack power (reported)", r.value * 1000, `secondary source: ${r.label} — not vendor-published`); });
     }
@@ -446,6 +454,9 @@ async function boot() {
   const meta = `${DB.parts.length} specification records · ${DB.meta.sources_count ?? "—"} sources · corpus verified ${DB.meta.verified}`;
   $("#hero-meta").textContent = meta;
   $("#foot-meta").textContent = `${meta}. Values tagged F (vendor-published), R (credible secondary, named), T (inference). Unpublished values are left empty.`;
+
+  const bm = DB.benchmarks && DB.benchmarks.gb200_nvl72_mlperf_v5_0;
+  if (bm) K.mlperf_tflops_per_gpu = bm.value_tflops_per_gpu;
 
   resetState();
   renderControls();

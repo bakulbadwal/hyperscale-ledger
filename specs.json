@@ -103,6 +103,22 @@
       "notes": "NVIDIA publishes IDENTICAL compute figures for 80GB PCIe and 80GB SXM — only memory bandwidth, TDP, form factor and interconnect differ. So on A100 the variant trap is a POWER and BANDWIDTH trap, not a throughput one."
     },
     {
+      "id": "a100-40gb-pcie", "name": "A100 40GB PCIe", "architecture": "Ampere", "launch_year": 2020,
+      "form_factor": "PCIe", "flagship": false, "has_tensor_cores": true,
+      "process_node": "TSMC 7nm N7", "transistors_b": 54.2,
+      "tdp_w": 250, "tdp_note": "'operates unconstrained up to its thermal design power (TDP) level of 250 W'; 'Total board power 250 W'",
+      "memory": { "capacity_gb": 40, "type": "HBM2", "bandwidth_tb_s": 1.555 },
+      "interconnect": "NVLink Bridge for 2 GPUs 600 GB/s; PCIe Gen4 64 GB/s",
+      "perf_dense": { "fp64": 9.7, "fp64_tc": 19.5, "fp32": 19.5, "tf32": 156, "bf16": 312, "fp16": 312, "fp8": null, "int8_tops": 624 },
+      "perf_sparse": { "tf32": 312, "bf16": 624, "fp16": 624, "fp8": null, "int8_tops": 1248 },
+      "sparsity_applies": true, "sparsity_footnote": "* With sparsity",
+      "nvidia_headline_convention": "prints BOTH figures as 'X | Y*'",
+      "source_url": "https://www.nvidia.com/content/dam/en-zz/Solutions/Data-Center/a100/pdf/pb-10577-001_v02.pdf",
+      "source_doc": "NVIDIA A100 40GB PCIe GPU Accelerator Product Brief, PB-10137-001_v03, September 2020",
+      "source_is_mirror": false, "accessed": "2026-08-28", "confidence": "F",
+      "notes": "THE PART BEHIND THE BOOK'S FIGURE. This is the September 2020 launch SKU, at 250 W — matching exactly the 'A100 250 W' rung in Ch. 19 of The Thinking Machine. The 80GB refresh followed in November 2020 at 300 W (PCIe) and 400 W (SXM). So Witt's number is a real, vendor-published A100 TDP; the defect is that it is a 40GB PCIe figure sitting in a series whose later rungs are flagship parts."
+    },
+    {
       "id": "h100-sxm", "name": "H100 SXM", "architecture": "Hopper", "launch_year": 2022,
       "form_factor": "SXM", "flagship": true, "has_tensor_cores": true,
       "process_node": "TSMC 4N (custom)", "transistors_b": 80,
@@ -122,7 +138,7 @@
       "id": "h100-nvl", "name": "H100 NVL", "architecture": "Hopper", "launch_year": 2022,
       "form_factor": "PCIe dual-slot air-cooled", "flagship": false, "has_tensor_cores": true,
       "process_node": "TSMC 4N (custom)", "transistors_b": 80,
-      "tdp_w": 400, "tdp_note": "350-400W (configurable)",
+      "tdp_w": 400, "tdp_range_w": [350, 400], "tdp_note": "350-400W (configurable)",
       "memory": { "capacity_gb": 94, "type": "HBM3", "bandwidth_tb_s": 3.9 },
       "interconnect": "NVLink 600 GB/s; PCIe Gen5 128 GB/s",
       "perf_dense": { "fp64": 30, "fp64_tc": 60, "fp32": 60, "tf32": 417.5, "bf16": 835.5, "fp16": 835.5, "fp8": 1670.5, "int8_tops": 1670.5 },
@@ -252,6 +268,22 @@
     }
   ],
 
+  "benchmarks": {
+    "gb200_nvl72_mlperf_v5_0": {
+      "value_tflops_per_gpu": 1960,
+      "benchmark": "MLPerf Training v5.0 — Llama 3.1 405B pretraining",
+      "quote": "GB200 NVL72 achieves up to 1,960 TFLOPS of training throughput with Llama 3.1 405B Pretraining benchmark",
+      "precision_stated_by_nvidia": false,
+      "precision_inferred": "FP8",
+      "precision_reasoning": "NVIDIA does not state the number format. It cannot be NVFP4: NVIDIA's own MLPerf Training v5.1 material describes that round as the first-ever NVFP4 training submission, so no v5.0 result is FP4. It is implausibly high for BF16: per-GPU dense BF16 is 2,500 TFLOPS, which would imply 78% model-FLOPs utilisation on a 405B pretrain. Against per-GPU dense FP8 of 5,000 TFLOPS it implies 39% MFU, which is an ordinary figure for a well-optimised run. The comparison basis used on this site is therefore dense FP8, not FP4.",
+      "confidence": "F",
+      "precision_inference_confidence": "T",
+      "source_url": "https://developer.nvidia.com/blog/nvidia-blackwell-delivers-up-to-2-6x-higher-performance-in-mlperf-training-v5-0/",
+      "accessed": "2026-08-28",
+      "scale_note": "The submission behind this figure ran at roughly 2,500 GPUs. It is evidence about delivered per-GPU throughput at that scale, not about fabric behaviour at 150,000 GPUs."
+    }
+  },
+
   "failure_modes": [
     {
       "id": "01",
@@ -284,17 +316,17 @@
       "source": "The Thinking Machine · Stephen Witt · Ch. 19 'Power'",
       "title": "The book's GPU power ladder mixes product lines",
       "claim": "Chapter 19 presents the escalation of AI power draw as a single series: <span class=\"mono\">A100 250 W → H100 350 W → B100 700 W → B200 1,000 W</span>. The chapter's argument is that per-chip power is exploding.",
-      "evidence": "NVIDIA publishes A100 80GB SXM at <strong>400 W</strong> and H100 SXM at <strong>up to 700 W</strong>. The 350 W figure corresponds to the H100 NVL / PCIe variant (350–400 W), not the SXM part. The first two rungs are entry or PCIe variants; the last two are flagship parts.",
+      "evidence": "<strong>Every one of these is a real, vendor-published TDP — but not of the same class of part.</strong> 250 W is the A100 <em>40GB PCIe</em> launch SKU; 350 W is the bottom of the H100 <em>NVL/PCIe</em> range. The flagship SXM parts of those generations are <strong>400 W</strong> and <strong>up to 700 W</strong>. B100 and B200 are quoted correctly. So the first two rungs are PCIe-class parts and the last two are flagship parts, in one series.",
       "table": {
         "head": [{ "t": "Part" }, { "t": "Witt, Ch. 19", "n": true }, { "t": "NVIDIA published (SXM)", "n": true }, { "t": "What Witt's figure matches" }],
         "rows": [
-          ["A100", "250 W", "400 W", "neither 80GB variant — 300 W PCIe is closest; 250 W is the older 40GB PCIe part <span class=\"tag t\">T</span>"],
-          ["H100", "350 W", "700 W", "the H100 NVL / PCIe variant (350–400 W)"],
+          ["A100", "250 W", "400 W", "the <strong>A100 40GB PCIe</strong> launch SKU — 250 W, vendor-published <span class=\"tag f\">F</span>"],
+          ["H100", "350 W", "700 W", "the H100 NVL / PCIe variant (350–400 W configurable)"],
           ["B100", "700 W", "700 W", "correct"],
           ["B200", "1,000 W", "1,000 W", "correct (HGX air-cooled; 1,200 W liquid in GB200 NVL72)"]
         ]
       },
-      "impact": "Compared like-for-like, the flagship SXM ladder is 400 → 700 → 1,000 W — a <strong>2.5× rise across two generations, not the 4×</strong> the table implies. The direction of Witt's argument survives; its slope does not. That this occurs in the chapter specifically about power is the point: these numbers are hard to handle even for a careful reporter with access.",
+      "impact": "Compared like-for-like, the flagship SXM ladder is 400 → 700 → 1,000 W — a <strong>2.5× rise across two generations, not the 4×</strong> the table implies. This is not a case of wrong numbers; it is inconsistent variant selection, which is a subtler and more common failure. The direction of Witt's argument survives and per-chip power really is climbing steeply; its slope does not survive. That it happens in the chapter specifically about power is the point — these figures are hard to handle even for a careful reporter with direct access to the company.",
       "sources": [
         { "url": "https://www.nvidia.com/en-us/data-center/a100/", "label": "NVIDIA A100" },
         { "url": "https://www.nvidia.com/en-us/data-center/h100/", "label": "NVIDIA H100" }

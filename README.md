@@ -33,7 +33,8 @@ This repo does two things about that:
 ## Findings
 
 - **Depreciation dominates energy.** On a 250 MW campus, moving GPU useful life from 5 years to 3 swings annual cost by roughly **$830 M** — about **5.6× the entire annual electricity bill** at US industrial rates. The AI-capex debate is conducted almost entirely in the language of power; power is the second-order term.
-- **Nameplate FLOPS overstate delivered throughput by roughly 5×.** Peak dense FP4 across the campus is ~1,500 EFLOPS; MLPerf-sustained throughput is ~294 EFLOPS.
+- **Nameplate overstates delivered throughput by ~2.55×, not the ~5× usually quoted.** Peak *dense FP8* across the campus is ~750 EFLOPS against ~294 EFLOPS MLPerf-sustained — 39%. The larger figure comes from comparing an FP4 nameplate against an FP8 measurement, which is a precision mismatch, not a utilisation finding. Half the advertised gap is one number-format halving. (My own first draft made exactly this error; it was caught on adversarial review.)
+- **The most load-bearing input in the whole model is not vendor-published.** NVIDIA states no rack power figure for GB200 NVL72 anywhere — the universal 120 kW is trade press, 132 kW is a Vertiv reference architecture.
 - **Holding precision fixed flattens the curve.** Much of the apparent acceleration in "GPU performance over time" is the arrival of narrower number formats, not silicon.
 - **The assigned book's power table mixes product lines.** Witt's Ch. 19 ladder pairs PCIe-variant TDPs with flagship parts; like-for-like the rise is 2.5×, not the 4× implied. Details in the Corrections view.
 
