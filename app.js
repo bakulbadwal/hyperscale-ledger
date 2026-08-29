@@ -183,7 +183,7 @@ function hallLayout(units) {
     racks.push({
       x: c * 1.32,
       y: r * 1.55 + (r >> 1) * 1.75,          // cold aisle after every rack pair
-      ph: (c * 0.55 + r * 1.9) % (Math.PI * 2)
+      ph: (c * 0.48 + r * 1.15) % (Math.PI * 2)
     });
   }
   const w = perRow * 1.32, d = rows * 1.55 + (rows >> 1) * 1.75;
@@ -221,6 +221,16 @@ function hallFrame(tms) {
   ctx.fillStyle = "rgba(13,28,43,.55)"; ctx.fill();
   ctx.strokeStyle = "rgba(201,169,106,.14)"; ctx.stroke();
 
+  // warm light pooled over the hall floor
+  ctx.save();
+  ctx.translate(ox, oy); ctx.scale(1, 0.5);
+  const glow = ctx.createRadialGradient(0, 0, 0, 0, 0, L.radius * s * 1.15);
+  glow.addColorStop(0, "rgba(212,178,110,.13)");
+  glow.addColorStop(1, "rgba(212,178,110,0)");
+  ctx.fillStyle = glow;
+  ctx.fillRect(-L.radius * s * 1.3, -L.radius * s * 1.3, L.radius * s * 2.6, L.radius * s * 2.6);
+  ctx.restore();
+
   // racks, painter-sorted by rotated depth
   const order = L.racks.map((r, i) => {
     const ry = (r.x - L.cx) * sin + (r.y - L.cy) * cos;
@@ -232,8 +242,8 @@ function hallFrame(tms) {
     const r = L.racks[i];
     const b = [P(r.x, r.y, 0), P(r.x + RW, r.y, 0), P(r.x + RW, r.y + RD, 0), P(r.x, r.y + RD, 0)];
     const tp = [P(r.x, r.y, RH), P(r.x + RW, r.y, RH), P(r.x + RW, r.y + RD, RH), P(r.x, r.y + RD, RH)];
-    const cDepth = (b[0][2] + b[1][2] + b[2][2] + b[3][2]) / 4;
     const cX = (b[0][0] + b[2][0]) / 2;
+    const p = H.reduced ? .5 : 0.5 + 0.5 * Math.sin(t * 2.2 + r.ph);
 
     // four side faces, depth-sorted: backs, then top, then fronts, then the pulse strip
     const faces = [0, 1, 2, 3].map(k => {
@@ -247,21 +257,24 @@ function hallFrame(tms) {
       ctx.fillStyle = fill; ctx.fill();
     };
 
-    quad(faces[0], "#0c1a2e"); quad(faces[1], "#0c1a2e");          // backs
-    ctx.beginPath(); ctx.moveTo(tp[0][0], tp[0][1]); ctx.lineTo(tp[1][0], tp[1][1]);
-    ctx.lineTo(tp[2][0], tp[2][1]); ctx.lineTo(tp[3][0], tp[3][1]); ctx.closePath();
-    ctx.fillStyle = "#2a4a78"; ctx.fill();
-    ctx.strokeStyle = "rgba(201,169,106,.16)"; ctx.stroke();
-    for (const f of [faces[2], faces[3]])                           // fronts, lit by facing
-      quad(f, f.x < cX ? "#1b3156" : "#122442");
+    quad(faces[0], "#12213a"); quad(faces[1], "#12213a");          // backs
+    const lid = () => {
+      ctx.beginPath(); ctx.moveTo(tp[0][0], tp[0][1]); ctx.lineTo(tp[1][0], tp[1][1]);
+      ctx.lineTo(tp[2][0], tp[2][1]); ctx.lineTo(tp[3][0], tp[3][1]); ctx.closePath();
+    };
+    lid(); ctx.fillStyle = "#26395c"; ctx.fill();
+    lid(); ctx.fillStyle = `rgba(212,178,110,${(.14 + .60 * p).toFixed(3)})`; ctx.fill();
+    ctx.strokeStyle = `rgba(232,205,146,${(.18 + .30 * p).toFixed(3)})`; ctx.stroke();
+    for (const f of [faces[2], faces[3]])                           // fronts, brass-warmed
+      quad(f, f.x < cX ? "#31405f" : "#1e2c48");
 
     // pulse strip on the frontmost face — brass power light running the aisle
     const F = faces[3];
-    const a = H.reduced ? .55 : .16 + .74 * (0.5 + 0.5 * Math.sin(t * 2.1 + r.ph));
+    const a = H.reduced ? .6 : .28 + .62 * p;
     const mx0 = (F.a[0] + F.b[0]) / 2, my0 = (F.a[1] + F.b[1]) / 2;
     const mx1 = (F.c[0] + F.d[0]) / 2, my1 = (F.c[1] + F.d[1]) / 2;
     ctx.strokeStyle = `rgba(201,169,106,${a.toFixed(3)})`;
-    ctx.lineWidth = Math.max(1.25, s * 0.11);
+    ctx.lineWidth = Math.max(1.5, s * 0.15);
     ctx.beginPath();
     ctx.moveTo(mx0 + (mx1 - mx0) * .12, my0 + (my1 - my0) * .12);
     ctx.lineTo(mx0 + (mx1 - mx0) * .88, my0 + (my1 - my0) * .88);
