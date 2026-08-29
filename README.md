@@ -15,9 +15,9 @@
 
 <br><br>
 
-<img src="docs/campus.gif" alt="The interactive isometric hall growing as IT load sweeps 90 to 570 MW — one box is ten GB200 NVL72 racks" width="100%">
+<img src="docs/campus.gif" alt="A full 360-degree orbit of the isometric hall, gold power pulses rippling down the aisles — one box is ten GB200 NVL72 racks" width="100%">
 
-<sub><b>Every box is ten real racks.</b> The hall is drawn from the model, not decoration — <b>drag it to rotate on the live site</b>; it grows as IT load sweeps 90 → 570 MW, and the counts above it are live.</sub>
+<sub><b>Every box is ten real racks, and the hall is drawn from the model, not decoration.</b> Shown here in a full orbit — <b>on the live site you drag it yourself</b>, it keeps momentum, and it grows or shrinks as every assumption moves. The camera is linkable too: <code>?yaw=2.4</code> opens this exact angle.</sub>
 
 </div>
 

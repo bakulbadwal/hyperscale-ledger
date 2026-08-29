@@ -192,7 +192,7 @@ function hallLayout(units) {
 
 function hallFrame(tms) {
   const H = HALL; if (!H.ctx || !H.layout) return;
-  const t = tms / 1000;
+  const t = tms / 1000 + (H.t0 || 0);
   if (H.dragX == null) {
     H.yaw += H.inertia; H.inertia *= 0.94;
     if (!H.reduced) H.yaw += H.spin;
@@ -637,6 +637,12 @@ async function boot() {
 
   const bm = DB.benchmarks && DB.benchmarks.gb200_nvl72_mlperf_v5_0;
   if (bm) K.mlperf_tflops_per_gpu = bm.value_tflops_per_gpu;
+
+  // Camera and clock are linkable too: ?yaw=2.4 opens the hall at that angle
+  // (and pins it), ?t0= offsets the pulse clock. Used for captures and sharing.
+  const hq = new URLSearchParams(location.search);
+  const qy = parseFloat(hq.get("yaw")); if (isFinite(qy)) { HALL.yaw = qy; HALL.spin = 0; }
+  const qt = parseFloat(hq.get("t0")); if (isFinite(qt)) HALL.t0 = qt;
 
   resetState();
   renderControls();
