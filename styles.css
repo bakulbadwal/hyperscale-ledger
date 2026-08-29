@@ -301,3 +301,15 @@ footer.foot a { color: var(--ink-subtle); }
 @media (prefers-reduced-motion: reduce) {
   .campus .u.on { animation: none; opacity: .62; }
 }
+
+/* ---------- campus canvas ---------- */
+.campus canvas {
+  display: block; width: 100%; height: 400px;
+  cursor: grab; touch-action: none;
+}
+.campus canvas:active { cursor: grabbing; }
+.campus-hint {
+  font-family: var(--sans); font-size: 10.5px; letter-spacing: .04em;
+  color: var(--ink-tertiary); text-transform: uppercase;
+  text-align: center; margin-top: 6px;
+}

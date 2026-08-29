@@ -162,37 +162,150 @@ function renderScenario() {
     <p class="sub" style="margin-top:12px;margin-bottom:0">Like-for-like, nameplate overstates delivered capacity by <strong style="color:var(--ink)">${fmt.n1(ratio)}×</strong>. Quote the same measurement against the <em>FP4</em> nameplate and it becomes ${fmt.n1(ratio * 2)}× — but half that gap is one precision halving, not lost utilisation.</p>`;
 }
 
-/* ---------- campus ----------
-   The hero visual is drawn from the model, not decoration: one glyph is one
-   rack-unit of real capacity, the grid grows and shrinks with the sliders, and
-   the sweep is power moving down the hall. Nothing here is stock art. */
-function renderCampus(m) {
-  const PER_UNIT = 10, COLS = 52, W = 10, H = 14, GAP = 3;
-  const units = Math.max(1, Math.round(m.racks / PER_UNIT));
-  const rows = Math.ceil(units / COLS);
-  const vbW = COLS * (W + GAP) - GAP;
-  const vbH = rows * (H + GAP) - GAP;
+/* ---------- campus: interactive isometric hall ----------
+   The hero visual is a 3D hall drawn from the model, not decoration: one box is
+   ten real GB200 NVL72 racks, laid out in aisled hot/cold pairs, and the whole
+   hall redraws as the sliders move. Drag to rotate; it slow-spins when idle. */
 
-  let g = "";
+const HALL = {
+  yaw: 0.82, spin: 0.0011, dragX: null, inertia: 0,
+  units: 0, layout: null, m: null,
+  canvas: null, ctx: null, raf: 0,
+  reduced: matchMedia("(prefers-reduced-motion: reduce)").matches
+};
+
+function hallLayout(units) {
+  const perRow = Math.max(10, Math.round(Math.sqrt(units * 4.4)));
+  const rows = Math.ceil(units / perRow);
+  const racks = [];
   for (let i = 0; i < units; i++) {
-    const c = i % COLS, r = (i / COLS) | 0;
-    const x = c * (W + GAP), y = r * (H + GAP);
-    const last = i >= units - (units % COLS || COLS);
-    const delay = (((c * 0.85 + r * 2.4) % 11) * 0.3).toFixed(2);
-    g += `<rect class="u on${last ? " edge" : ""}" x="${x}" y="${y}" width="${W}" height="${H}" rx="1.5" style="animation-delay:${delay}s"/>`;
+    const r = (i / perRow) | 0, c = i % perRow;
+    racks.push({
+      x: c * 1.32,
+      y: r * 1.55 + (r >> 1) * 1.75,          // cold aisle after every rack pair
+      ph: (c * 0.55 + r * 1.9) % (Math.PI * 2)
+    });
+  }
+  const w = perRow * 1.32, d = rows * 1.55 + (rows >> 1) * 1.75;
+  return { racks, cx: w / 2, cy: d / 2, radius: Math.hypot(w, d) / 2 };
+}
+
+function hallFrame(tms) {
+  const H = HALL; if (!H.ctx || !H.layout) return;
+  const t = tms / 1000;
+  if (H.dragX == null) {
+    H.yaw += H.inertia; H.inertia *= 0.94;
+    if (!H.reduced) H.yaw += H.spin;
   }
 
-  $("#campus").innerHTML = `
-    <div class="campus">
-      <div class="campus-head">
-        <span class="t">Campus at ${fmt.int(S.it_mw)} MW — one glyph is ${PER_UNIT} racks</span>
-        <span class="r">${fmt.int(m.racks)} racks · ${fmt.int(m.gpus)} GPUs · ${fmt.n1(m.facilityMW)} MW drawn · ${fmt.n2(m.twh)} TWh/yr</span>
-      </div>
-      <svg viewBox="0 0 ${vbW} ${vbH}" preserveAspectRatio="xMidYMin meet"
-           role="img" aria-label="${fmt.int(m.racks)} GB200 NVL72 racks at ${fmt.int(S.it_mw)} megawatts">
-        ${g}
-      </svg>
-    </div>`;
+  const cv = H.canvas, ctx = H.ctx;
+  const cssW = cv.clientWidth, cssH = cv.clientHeight;
+  const dpr = window.devicePixelRatio || 1;
+  if (cv.width !== (cssW * dpr) | 0) { cv.width = cssW * dpr; cv.height = cssH * dpr; }
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, cssW, cssH);
+
+  const L = H.layout;
+  const cos = Math.cos(H.yaw), sin = Math.sin(H.yaw);
+  const s = Math.min(cssW / (L.radius * 1.8), cssH / (L.radius * 1.08));
+  const ox = cssW / 2, oy = cssH * 0.56;
+  const P = (x, y, z) => {
+    const rx = (x - L.cx) * cos - (y - L.cy) * sin;
+    const ry = (x - L.cx) * sin + (y - L.cy) * cos;
+    return [ox + rx * s, oy + ry * 0.5 * s - z * s * 0.92, ry];
+  };
+
+  // floor slab
+  const f = [P(-1.2, -1.2, 0), P(L.cx * 2 + 1.2, -1.2, 0), P(L.cx * 2 + 1.2, L.cy * 2 + 1.2, 0), P(-1.2, L.cy * 2 + 1.2, 0)];
+  ctx.beginPath(); f.forEach((p, i) => i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1])); ctx.closePath();
+  ctx.fillStyle = "rgba(13,28,43,.55)"; ctx.fill();
+  ctx.strokeStyle = "rgba(201,169,106,.14)"; ctx.stroke();
+
+  // racks, painter-sorted by rotated depth
+  const order = L.racks.map((r, i) => {
+    const ry = (r.x - L.cx) * sin + (r.y - L.cy) * cos;
+    return [ry, i];
+  }).sort((a, b) => a[0] - b[0]);
+
+  const RW = 1.0, RD = 0.85, RH = 1.55;
+  for (const [, i] of order) {
+    const r = L.racks[i];
+    const b = [P(r.x, r.y, 0), P(r.x + RW, r.y, 0), P(r.x + RW, r.y + RD, 0), P(r.x, r.y + RD, 0)];
+    const tp = [P(r.x, r.y, RH), P(r.x + RW, r.y, RH), P(r.x + RW, r.y + RD, RH), P(r.x, r.y + RD, RH)];
+    const cDepth = (b[0][2] + b[1][2] + b[2][2] + b[3][2]) / 4;
+    const cX = (b[0][0] + b[2][0]) / 2;
+
+    // four side faces, depth-sorted: backs, then top, then fronts, then the pulse strip
+    const faces = [0, 1, 2, 3].map(k => {
+      const a = tp[k], bq = tp[(k + 1) % 4], c = b[(k + 1) % 4], d = b[k];
+      return { a, b: bq, c, d, depth: (a[2] + bq[2]) / 2, x: (a[0] + bq[0]) / 2 };
+    }).sort((p, q) => p.depth - q.depth);
+
+    const quad = (f, fill) => {
+      ctx.beginPath(); ctx.moveTo(f.a[0], f.a[1]); ctx.lineTo(f.b[0], f.b[1]);
+      ctx.lineTo(f.c[0], f.c[1]); ctx.lineTo(f.d[0], f.d[1]); ctx.closePath();
+      ctx.fillStyle = fill; ctx.fill();
+    };
+
+    quad(faces[0], "#0c1a2e"); quad(faces[1], "#0c1a2e");          // backs
+    ctx.beginPath(); ctx.moveTo(tp[0][0], tp[0][1]); ctx.lineTo(tp[1][0], tp[1][1]);
+    ctx.lineTo(tp[2][0], tp[2][1]); ctx.lineTo(tp[3][0], tp[3][1]); ctx.closePath();
+    ctx.fillStyle = "#2a4a78"; ctx.fill();
+    ctx.strokeStyle = "rgba(201,169,106,.16)"; ctx.stroke();
+    for (const f of [faces[2], faces[3]])                           // fronts, lit by facing
+      quad(f, f.x < cX ? "#1b3156" : "#122442");
+
+    // pulse strip on the frontmost face — brass power light running the aisle
+    const F = faces[3];
+    const a = H.reduced ? .55 : .16 + .74 * (0.5 + 0.5 * Math.sin(t * 2.1 + r.ph));
+    const mx0 = (F.a[0] + F.b[0]) / 2, my0 = (F.a[1] + F.b[1]) / 2;
+    const mx1 = (F.c[0] + F.d[0]) / 2, my1 = (F.c[1] + F.d[1]) / 2;
+    ctx.strokeStyle = `rgba(201,169,106,${a.toFixed(3)})`;
+    ctx.lineWidth = Math.max(1.25, s * 0.11);
+    ctx.beginPath();
+    ctx.moveTo(mx0 + (mx1 - mx0) * .12, my0 + (my1 - my0) * .12);
+    ctx.lineTo(mx0 + (mx1 - mx0) * .88, my0 + (my1 - my0) * .88);
+    ctx.stroke(); ctx.lineWidth = 1;
+  }
+  if (!H.reduced || H.dragX != null || Math.abs(H.inertia) > 1e-4)
+    H.raf = requestAnimationFrame(hallFrame);
+  else H.raf = 0;
+}
+
+function renderCampus(m) {
+  const H = HALL; H.m = m;
+  const PER_UNIT = 10;
+  const units = Math.max(1, Math.round(m.racks / PER_UNIT));
+
+  if (!H.canvas) {
+    $("#campus").innerHTML = `
+      <div class="campus">
+        <div class="campus-head">
+          <span class="t" id="campus-t"></span>
+          <span class="r" id="campus-r"></span>
+        </div>
+        <canvas id="campus-cv" aria-label="Interactive isometric hall of GB200 NVL72 racks, drawn from the model"></canvas>
+        <div class="campus-hint">drag to rotate · one box is ${PER_UNIT} racks · redraws live with every assumption</div>
+      </div>`;
+    H.canvas = $("#campus-cv"); H.ctx = H.canvas.getContext("2d");
+    H.canvas.addEventListener("pointerdown", e => {
+      H.dragX = e.clientX; H.inertia = 0; H.canvas.setPointerCapture(e.pointerId);
+      if (!H.raf) H.raf = requestAnimationFrame(hallFrame);
+    });
+    H.canvas.addEventListener("pointermove", e => {
+      if (H.dragX == null) return;
+      const dx = e.clientX - H.dragX; H.dragX = e.clientX;
+      H.yaw += dx * 0.006; H.inertia = dx * 0.0022;
+    });
+    const up = () => { H.dragX = null; };
+    H.canvas.addEventListener("pointerup", up);
+    H.canvas.addEventListener("pointercancel", up);
+  }
+  if (units !== H.units) { H.units = units; H.layout = hallLayout(units); }
+  $("#campus-t").textContent = `Campus at ${fmt.int(S.it_mw)} MW — the hall, to scale`;
+  $("#campus-r").textContent =
+    `${fmt.int(m.racks)} racks · ${fmt.int(m.gpus)} GPUs · ${fmt.n1(m.facilityMW)} MW drawn · ${fmt.n2(m.twh)} TWh/yr`;
+  if (!H.raf) H.raf = requestAnimationFrame(hallFrame);
 }
 
 /* ---------- tornado ---------- */
