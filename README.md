@@ -15,9 +15,9 @@
 
 <br><br>
 
-<img src="docs/campus.gif" alt="The campus grid redrawing as IT load sweeps from 90 to 590 MW — one glyph is ten GB200 NVL72 racks" width="100%">
+<img src="docs/campus.gif" alt="The interactive isometric hall growing as IT load sweeps 90 to 570 MW — one box is ten GB200 NVL72 racks" width="100%">
 
-<sub><b>Every glyph is ten real racks.</b> The grid is drawn from the model, not decoration — it redraws as IT load sweeps 90 → 590 MW, and the counts above it are live.</sub>
+<sub><b>Every box is ten real racks.</b> The hall is drawn from the model, not decoration — <b>drag it to rotate on the live site</b>; it grows as IT load sweeps 90 → 570 MW, and the counts above it are live.</sub>
 
 </div>
 
