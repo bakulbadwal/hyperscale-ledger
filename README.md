@@ -17,7 +17,7 @@
 
 <img src="docs/campus.gif" alt="A full 360-degree orbit of the isometric hall, gold power pulses rippling down the aisles — one box is ten GB200 NVL72 racks" width="100%">
 
-<sub><b>Every box is ten real racks, and the hall is drawn from the model, not decoration.</b> Shown here in a full orbit — <b>on the live site you drag it yourself</b>, it keeps momentum, and it grows or shrinks as every assumption moves. The camera is linkable too: <code>?yaw=2.4</code> opens this exact angle.</sub>
+<sub><b>Every box is ten real racks, and the hall is drawn from the model.</b> Shown here in a full orbit — <b>on the live site you drag it yourself</b>, it keeps momentum, and it grows or shrinks as every assumption moves. The camera is linkable too: <code>?yaw=2.4</code> opens this exact angle.</sub>
 
 </div>
 
@@ -94,7 +94,7 @@ python3 -m http.server 8000
 
 Every view is hash-addressable — `#trend`, `#corrections` — and every model input can be preset from the query string, so a specific case is linkable: [`?it_mw=400&gpu_life=3`](https://bakulbadwal.github.io/hyperscale-ledger/?it_mw=400&gpu_life=3).
 
-## Honest limits
+## Limits
 
 - NVIDIA datacenter parts only. No AMD Instinct, no TPU, no Trainium.
 - Rack pricing is secondary-sourced everywhere and marked as such; NVIDIA publishes none.
@@ -108,6 +108,6 @@ Every view is hash-addressable — `#trend`, `#corrections` — and every model 
 
 Built by **[Bakul Badwal](https://www.linkedin.com/in/bakulbadwal/)** — MBA Candidate, UVA Darden, Class of 2027 — with [Claude Code](https://claude.com/claude-code).
 <br>For **GBUS 8255 — Business of AI Reading Seminar** (Laseter) · Session 3, *The Thinking Machine* (Stephen Witt)
-<br>Companion to **[The AI Stack Field Atlas](https://github.com/bakulbadwal/ai-stack-field-atlas)** · MIT licensed
+<br>Companion to **[The AI Stack Field Atlas](https://github.com/bakulbadwal/ai-stack-field-atlas) - built during AI Summer 2026** · MIT licensed
 
 </div>
