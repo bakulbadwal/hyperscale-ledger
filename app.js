@@ -201,7 +201,8 @@ function hallFrame(tms) {
   const cv = H.canvas, ctx = H.ctx;
   const cssW = cv.clientWidth, cssH = cv.clientHeight;
   const dpr = window.devicePixelRatio || 1;
-  if (cv.width !== (cssW * dpr) | 0) { cv.width = cssW * dpr; cv.height = cssH * dpr; }
+  const bw = Math.round(cssW * dpr), bh = Math.round(cssH * dpr);
+  if (cv.width !== bw || cv.height !== bh) { cv.width = bw; cv.height = bh; }
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   ctx.clearRect(0, 0, cssW, cssH);
 
@@ -597,9 +598,31 @@ function renderCorpus() {
     <td class="n sub">${p.accessed}</td><td>${tag(p.confidence)}</td></tr>`).join("")}</tbody></table>`;
 }
 
+/* ══════════════════ glossary ══════════════════ */
+
+function renderGlossary() {
+  const T = DB.terms || [];
+  $("#glossary").innerHTML = T.map(t => `
+    <li class="g">
+      <div class="g-n">${String(t.n).padStart(2, "0")}</div>
+      <div class="g-body">
+        <div class="g-head"><h3>${t.term}</h3>${tag(t.tag)}
+          ${t.view ? `<a class="g-go" href="#${t.view}">see it in ${t.view} →</a>` : ""}</div>
+        <p class="g-what">${t.what}</p>
+        <p class="g-hook"><span class="g-lbl">The part people miss</span>${t.hook}</p>
+      </div>
+    </li>`).join("");
+
+  const c = DB.carry_in;
+  $("#carry-in").innerHTML = c ? `
+    <p class="eyebrow" style="margin-bottom:6px">The one number to carry in ${tag(c.tag)}</p>
+    <p style="font-family:var(--display);font-size:19px;line-height:1.35;color:var(--ink);margin-bottom:8px">${c.line}</p>
+    <p style="margin-bottom:0">${c.why} ${c.view ? `<a href="#${c.view}">See it move →</a>` : ""}</p>` : "";
+}
+
 /* ══════════════════ boot ══════════════════ */
 
-const VIEWS = ["scenario", "trend", "check", "corrections", "corpus"];
+const VIEWS = ["scenario", "trend", "check", "corrections", "corpus", "glossary"];
 
 function showView(name, { scroll = true, setHash = true } = {}) {
   if (!VIEWS.includes(name)) name = "scenario";
@@ -614,7 +637,7 @@ function tabs() {
   $$("#tabs button").forEach(b =>
     b.addEventListener("click", () => showView(b.dataset.view)));
   window.addEventListener("hashchange", () =>
-    showView(location.hash.slice(1), { scroll: false, setHash: false }));
+    showView(location.hash.slice(1), { scroll: true, setHash: false }));
   showView(location.hash.slice(1) || "scenario", { scroll: false });
 }
 
@@ -651,6 +674,7 @@ async function boot() {
   renderFailureModes();
   renderCorrections();
   renderCorpus();
+  renderGlossary();
   tabs();
 
   $("#reset").addEventListener("click", () => { resetState(); renderControls(); renderScenario(); });

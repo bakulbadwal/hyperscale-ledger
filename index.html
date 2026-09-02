@@ -22,6 +22,7 @@
       <button role="tab" data-view="check"      aria-selected="false">Claim check</button>
       <button role="tab" data-view="corrections" aria-selected="false">Corrections</button>
       <button role="tab" data-view="corpus"     aria-selected="false">Corpus</button>
+      <button role="tab" data-view="glossary"   aria-selected="false">Glossary</button>
     </nav>
   </div>
 </header>
@@ -162,6 +163,16 @@
     <p class="sub">Every page actually fetched, with access date.</p>
     <div id="sources"></div>
   </div>
+</section>
+
+<!-- ══════════ GLOSSARY ══════════ -->
+<section class="view stack" id="view-glossary" hidden>
+  <div class="panel">
+    <h2>Ten terms to walk in with</h2>
+    <p class="sub">Each with the part the room won't know. Every figure verified against the corpus; tags mark where it came from. Each entry links to the view where the number lives.</p>
+    <ol class="gloss" id="glossary"></ol>
+  </div>
+  <div class="callout" id="carry-in"></div>
 </section>
 
 </main>

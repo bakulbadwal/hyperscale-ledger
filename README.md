@@ -36,7 +36,7 @@ So this repo does two things:
 1. **[`specs.json`](specs.json)** — a corpus where sparse and dense are separate fields, variants are separate records, every value carries a source URL and an access date, and unpublished values are `null` rather than guessed.
 2. **A scenario model** on top of it, which makes the load-bearing assumptions manipulable so they can be argued with instead of taken on faith.
 
-## The five views
+## The six views
 
 | | View | What it does |
 |---|---|---|
@@ -45,6 +45,7 @@ So this repo does two things:
 | [🔗](https://bakulbadwal.github.io/hyperscale-ledger/#check) | **Claim check** | Paste a FLOPS or TDP figure; it reports every part, precision and variant the number is consistent with, and flags the ambiguity. Try `989`. |
 | [🔗](https://bakulbadwal.github.io/hyperscale-ledger/#corrections) | **Corrections** | Published claims that do not survive checking — including the GPU power table in Ch. 19 of *The Thinking Machine*. |
 | [🔗](https://bakulbadwal.github.io/hyperscale-ledger/#corpus) | **Corpus** | The whole dataset, inspectable, with every source and access date. |
+| [🔗](https://bakulbadwal.github.io/hyperscale-ledger/#glossary) | **Glossary** | The ten data-center terms to walk into a room with — each with the part people miss, its provenance tag, and a link to the view where the number lives. |
 
 ## Findings
 
@@ -83,7 +84,7 @@ No framework, no build step, no dependencies — plain HTML/CSS/JS, so it runs a
 |---|---|
 | [`specs.json`](specs.json) | The corpus. Every fact, with provenance. The only file that changes when hardware ships. |
 | [`index.html`](index.html) | Page shell. No factual content. |
-| [`app.js`](app.js) | Fetches the corpus, renders the five views, runs the model arithmetic — deliberately simple enough to audit by reading. |
+| [`app.js`](app.js) | Fetches the corpus, renders the six views, runs the model arithmetic — deliberately simple enough to audit by reading. |
 | [`styles.css`](styles.css) | Design language — deep navy, brass accent, warm paper ink, Fraunces display serif, carried over from [ai-stack-field-atlas](https://github.com/bakulbadwal/ai-stack-field-atlas). |
 
 `app.js` fetches `specs.json`, so `file://` fails on CORS. Serve it:
